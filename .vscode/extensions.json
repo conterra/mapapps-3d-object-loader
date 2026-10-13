@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "dbaeumer.vscode-eslint",
+        "vue.volar",
+        "esri.arcgis-maps-sdk-js-snippets",
+        "ctjdr.vscode-apprt-bundles"
+    ]
+}

@@ -1,0 +1,846 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2025 con terra GmbH (info@conterra.de)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>de.conterra.devnet</groupId>
+    <artifactId>mapapps-devnet-blueprint</artifactId>
+    <version>4.20.3-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <dependencyManagement>
+        <dependencies>
+            <!-- dependency versions available -->
+            <dependency>
+                <groupId>de.conterra.mapapps</groupId>
+                <artifactId>ct-mapapps-js-bom</artifactId>
+                <version>${apprt.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    <dependencies>
+        <!-- include only if old intern test libs are required -->
+        <dependency>
+            <groupId>de.conterra.mapapps</groupId>
+            <artifactId>ct-mapapps-js-bom-dev-test</artifactId>
+            <version>${apprt.version}</version>
+            <type>pom</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.conterra.devnet</groupId>
+            <artifactId>mapapps-imprint-privacy</artifactId>
+            <version>1.0.3</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>de.conterra.mapapps</groupId>
+                    <artifactId>mapapps-maven-plugin</artifactId>
+                    <version>${mapapps.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>de.conterra.jsregistry</groupId>
+                    <artifactId>ct-jsregistry-maven-plugin</artifactId>
+                    <version>${ct.jsregistry.version}</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>2.8.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.1.0</version>
+                    <configuration>
+                        <escapeString>\</escapeString>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>3.2.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.2.0</version>
+                    <configuration>
+                        <classesDirectory>${js.build.outputPath}</classesDirectory>
+                        <includes>
+                            <include>**/*</include>
+                        </includes>
+                        <excludes>
+                            <exclude>apps/**</exclude>
+                            <exclude>**/tests/**</exclude>
+                            <exclude>**/sample_tests/**</exclude>
+                            <exclude>**/theme-common/**</exclude>
+                        </excludes>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>3.2.3</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>properties-maven-plugin</artifactId>
+                    <version>1.0.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>com.google.code.maven-replacer-plugin</groupId>
+                    <artifactId>replacer</artifactId>
+                    <version>1.5.3</version>
+                </plugin>
+                <plugin>
+                    <groupId>com.github.eirslett</groupId>
+                    <artifactId>frontend-maven-plugin</artifactId>
+                    <version>1.15.4</version>
+                    <configuration>
+                        <nodeVersion>v22.17.1</nodeVersion>
+                        <!-- Keep this in sync with the package manager version in package.json -->
+                        <pnpmVersion>10.18.3</pnpmVersion>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>3.1.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>2.5.3</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>3.0.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>com.mycila</groupId>
+                    <artifactId>license-maven-plugin</artifactId>
+                    <version>2.11</version>
+                </plugin>
+                <plugin>
+                    <groupId>de.conterra.maven</groupId>
+                    <artifactId>setproperties-maven-plugin</artifactId>
+                    <version>1.0.5</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <sourceDirectory>src/main/js</sourceDirectory>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <includes>
+                    <include>application.properties</include>
+                </includes>
+                <filtering>true</filtering>
+            </testResource>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <excludes>
+                    <exclude>application.properties</exclude>
+                </excludes>
+            </testResource>
+            <testResource>
+                <directory>src/test/webapp</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </testResource>
+        </testResources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.4.1</version>
+                <executions>
+                    <execution>
+                        <id>enforce-versions</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>[3.8.0,)</version>
+                                </requireMavenVersion>
+                                <requireJavaVersion>
+                                    <version>[17,)</version>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>de.conterra.maven</groupId>
+                <artifactId>setproperties-maven-plugin</artifactId>
+                <version>1.0.5</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>setProperties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <properties>
+                        <mapapps.remote.base>.</mapapps.remote.base>
+                    </properties>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.5.0</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>unpack-themes-src</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <stripVersion>true</stripVersion>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>de.conterra.mapapps</groupId>
+                                    <artifactId>ct-mapapps-js</artifactId>
+                                    <classifier>src</classifier>
+                                    <outputDirectory>${project.build.directory}/unpacked</outputDirectory>
+                                    <includes>layout/theme-everlasting/**,layout/theme-common/**</includes>
+                                    <excludes>layout/theme-everlasting/styles/vuetify/**</excludes>
+                                </artifactItem>
+                                <artifactItem>
+                                    <!-- unpack stylus files provided by beautify to map.apps themes -->
+                                    <groupId>org.vuetifyjs</groupId>
+                                    <artifactId>vuetify</artifactId>
+                                    <classifier>dev</classifier>
+                                    <outputDirectory>${project.build.directory}/unpacked/layout</outputDirectory>
+                                    <includes>vuetify/stylus/**</includes>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy js-libs into 'bundle-imports'</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/bundle-imports</outputDirectory>
+                            <includeTypes>jar</includeTypes>
+                            <stripVersion>true</stripVersion>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <!-- ensure test resources are copied together with normal resources -->
+                        <goals>
+                            <goal>testResources</goal>
+                        </goals>
+                        <phase>process-resources</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <?m2e ignore?>  <!-- Skip this execution on Java Autobuild -->
+                        <id>run gulp ${gulp.task}</id>
+                        <goals>
+                            <goal>gulp</goal>
+                        </goals>
+                        <phase>process-resources</phase>
+                        <configuration>
+                            <arguments>${gulp.task}</arguments>
+                            <environmentVariables>
+                                <NODE_ENV>${gulp.node.env}</NODE_ENV>
+                            </environmentVariables>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <configuration>
+                    <header>${project.baseUri}apache2-license-header.txt</header>
+                    <properties>
+                        <owner>con terra GmbH</owner>
+                        <email>info@conterra.de</email>
+                        <project.inceptionYear>2025</project.inceptionYear>
+                    </properties>
+                    <includes>
+                        <include>src/main/js/**/*.js</include>
+                        <include>src/main/js/**/*.ts</include>
+                        <include>src/main/js/**/*.vue</include>
+                        <include>src/main/js/**/*.css</include>
+                        <include>src/test/**/*.js</include>
+                        <include>src/test/**/*.html</include>
+                        <include>src/test/**/*.css</include>
+                        <include>src/test/**/application.properties</include>
+                        <include>src/main/config/assembly.xml</include>
+                        <include>**/build.properties</include>
+                        <include>**/gulpfile.js</include>
+                        <include>**/pom.xml</include>
+                    </includes>
+                    <excludes>
+                        <exclude>src/main/js/**/*.min.js</exclude>
+                    </excludes>
+                    <mapping>
+                        <vue>XML_STYLE</vue>
+                    </mapping>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>format</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.google.code.maven-replacer-plugin</groupId>
+                <artifactId>replacer</artifactId>
+                <executions>
+                    <execution>
+                        <id>replace some config settings in app.json</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                        <configuration>
+                            <basedir>${js.build.outputPath}</basedir>
+                            <includes>
+                                <include>**/app.json</include>
+                            </includes>
+                            <regex>true</regex>
+                            <replacements>
+                                <replacement>
+                                    <!-- remove bundleLocations from app.json -->
+                                    <token>\s*"bundleLocations"\s*:\s*\[\s*"localbundles"\s*,\s*"bundles"\s*\]\s*,\s*</token>
+                                    <value></value>
+                                </replacement>
+                            </replacements>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>de.conterra.jsregistry</groupId>
+                <artifactId>ct-jsregistry-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>build-jsregistry.properties</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>buildPacksProperties</goal>
+                        </goals>
+                        <configuration>
+                            <!-- don't list not shipped bundles in the
+                            META-INF\js-registry-packs.properties file -->
+                            <scanPackagesExcludes>apps/**,bundles/sample_tests</scanPackagesExcludes>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <sourceDirectory>${js.build.outputPath}</sourceDirectory>
+                    <outputDirectory>${js.build.outputPath}</outputDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>de.conterra.mapapps</groupId>
+                <artifactId>mapapps-maven-plugin</artifactId>
+                <configuration>
+                    <!-- only build zip files -->
+                    <skipDeploy>true</skipDeploy>
+                    <createApp>false</createApp>
+                    <sourceDirectory>${js.build.outputPath}/apps</sourceDirectory>
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <!-- used to create .zip files containing the apps during the build -->
+                        <id>create-app-zips</id>
+                        <goals>
+                            <goal>deployApps</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>build-app-template</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>deployAppTemplate</goal>
+                        </goals>
+                        <configuration>
+                            <templateFile>
+                                ${project.build.directory}/${project.artifactId}-sample-app.zip</templateFile>
+                            <templateResources>
+                                <templateResource>
+                                    <directory>${js.build.outputPath}/apps/sample</directory>
+                                    <includes>
+                                        <include>**/*</include>
+                                    </includes>
+                                </templateResource>
+                            </templateResources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/config/assembly.xml</descriptor>
+                    </descriptors>
+                    <finalName>${project.artifactId}-bundle</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-zip</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-release-plugin</artifactId>
+                <configuration>
+                    <tagNameFormat>@{project.version}</tagNameFormat>
+                    <preparationGoals>clean</preparationGoals>
+                    <releaseProfiles>compress</releaseProfiles>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <scm>
+        <connection>scm:git:https://github.com/conterra/mapapps-devnet-blueprint.git</connection>
+        <developerConnection>scm:git:https://github.com/conterra/mapapps-devnet-blueprint.git
+        </developerConnection>
+        <url>https://github.com/conterra/mapapps-devnet-blueprint</url>
+        <tag>HEAD</tag>
+    </scm>
+    <distributionManagement>
+        <repository>
+            <id>${dist.releases.id}</id>
+            <url>${dist.releases.url}</url>
+        </repository>
+        <snapshotRepository>
+            <id>${dist.snapshots.id}</id>
+            <url>${dist.snapshots.url}</url>
+        </snapshotRepository>
+    </distributionManagement>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <root.build.outputPath>${project.build.directory}/webapp</root.build.outputPath>
+        <js.build.outputPath>${root.build.outputPath}/js</js.build.outputPath>
+
+
+        <mapapps.version>4.20.3</mapapps.version>
+        <!-- JS lib versions -->
+        <apprt.version>${mapapps.version}</apprt.version>
+
+        <!-- java lib versions -->
+        <ct.jsregistry.version>2.1.10</ct.jsregistry.version>
+
+        <!-- the default app, replaced in the *.html files to switch app names-->
+        <default.app.name>sample</default.app.name>
+
+        <!-- don't do this in production configuration! This allows to go any http traffic over the
+        /proxy endpoint -->
+        <proxy.allowedServerUrls>
+            *://*:*/**;
+        </proxy.allowedServerUrls>
+        <proxy.allowedSSLDNs>*</proxy.allowedSSLDNs>
+        <proxy.use.rules></proxy.use.rules>
+        <cors.request.trustedServers>$\{mapapps.remote.base\}</cors.request.trustedServers>
+
+        <mvn.cmd>mvn</mvn.cmd>
+        <gulp.task></gulp.task>
+        <gulp.node.env>development</gulp.node.env>
+
+        <!-- Set username for map.apps remote installation, use ${env.MAPAPPS_USER} to reference a environment variable -->
+        <mapapps.user>${env.MAPAPPS_USER}</mapapps.user>
+        <!-- Set password for map.apps remote installation, use ${env.MAPAPPS_USER_PASSWORD} to reference a environment variable -->
+        <mapapps.pw></mapapps.pw>
+        <!-- Set token for map.apps remote installation, use ${env.MAPAPPS_TOKEN} to reference a environment variable -->
+        <mapapps.token></mapapps.token>
+
+        <!-- set to false if map.apps is configured behind integrated windows authentication is
+        required -->
+        <mapapps.useChunkedRequestEncoding>true</mapapps.useChunkedRequestEncoding>
+        <!-- enable this if "upload" profile should only deploy bundles -->
+        <skip.apps.upload>true</skip.apps.upload>
+        <!-- enable this if "upload" profile should pre-optimize apps -->
+        <triggerPreOptimization>false</triggerPreOptimization>
+    </properties>
+    <profiles>
+        <profile>
+            <id>include-mapapps-deps</id>
+            <dependencies>
+                <dependency>
+                    <groupId>de.conterra.mapapps</groupId>
+                    <artifactId>ct-mapapps-js-bom-dev</artifactId>
+                    <version>${apprt.version}</version>
+                    <type>pom</type>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>node-install</id>
+            <activation>
+                <property>
+                    <name>env</name>
+                    <value>!dev</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>install node and pnpm</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <!--
+                                        npm is still needed for publishing etc. (called by pnpm)
+                                    -->
+                                    <goal>install-node-and-npm</goal>
+                                    <goal>install-node-and-pnpm</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>pnpm install</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>pnpm</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>install</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>env-dev</id>
+            <!-- This is the development profile, per default it points to a build.properties
+                file in the user home, but this can be changed localy by specifiying the
+                property local.configfile with its own string.
+            -->
+            <activation>
+                <property>
+                    <name>env</name>
+                    <value>dev</value>
+                </property>
+            </activation>
+            <properties>
+                <local.configfile>${basedir}/build.properties</local.configfile>
+                <!-- -Denv=dev enables preview mode -->
+                <gulp.task>preview</gulp.task>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>properties-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>read-project-properties</goal>
+                                </goals>
+                                <configuration>
+                                    <quiet>true</quiet>
+                                    <files>
+                                        <file>${local.configfile}</file>
+                                    </files>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>run-js-tests</id>
+            <properties>
+                <gulp.task>test</gulp.task>
+            </properties>
+        </profile>
+        <profile>
+            <id>compress</id>
+            <properties>
+                <gulp.task>compress</gulp.task>
+                <gulp.node.env>production</gulp.node.env>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-deploy-plugin</artifactId>
+                        <configuration>
+                            <updateReleaseInfo>true</updateReleaseInfo>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>de.conterra.jsregistry</groupId>
+                        <artifactId>ct-jsregistry-maven-plugin</artifactId>
+                        <executions>
+                            <!--
+                            No longer required when the rollup build is in use, because the calculation of the dependencies is done via rollup build.
+                            -->
+                            <execution>
+                                <id>calculate js dependencies</id>
+                                <goals>
+                                    <goal>calculateDependencies</goal>
+                                </goals>
+                            </execution>
+                            <!--
+
+                                The optimizeJS goal is usually no longer required because compression is done via terser (see
+                            gulpfile.js 'compress' option).
+                                Uncomment this block only if you're still using `dojo/text!` in your source code.
+                                Reenabling the optimizeJS goal unfortunately removes all comments from your built JavaScript, which
+                                would incidentally also break source maps.
+
+                            <execution>
+                                <id>optimize js</id>
+                                <goals>
+                                    <goal>optimizeJS</goal>
+                                </goals>
+                                <configuration>
+                                    <compress>false</compress>
+                                </configuration>
+                            </execution> -->
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>upload</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>de.conterra.mapapps</groupId>
+                        <artifactId>mapapps-maven-plugin</artifactId>
+                        <configuration>
+                            <skipDeploy>${skip.apps.upload}</skipDeploy>
+                            <deployAsApp>true</deployAsApp>
+                            <appName>${project.artifactId}</appName>
+                            <appTitle>${project.artifactId}-${project.version}</appTitle>
+                            <appEditorState>PUBLISHED</appEditorState>
+                            <serverResourcesEndpoint>${mapapps.remote.base}/resources</serverResourcesEndpoint>
+                            <username>${mapapps.user}</username>
+                            <password>${mapapps.pw}</password>
+                            <token>${mapapps.token}</token>
+                            <useChunkedRequestEncoding>${mapapps.useChunkedRequestEncoding}</useChunkedRequestEncoding>
+                            <triggerPreOptimization>${triggerPreOptimization}</triggerPreOptimization>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>de.conterra.jsregistry</groupId>
+                        <artifactId>ct-jsregistry-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>deploy-bundles</id>
+                                <goals>
+                                    <goal>deployJSPackage</goal>
+                                </goals>
+                                <configuration>
+                                    <registryEndpoint>${mapapps.remote.base}/resources/jsregistry</registryEndpoint>
+                                    <username>${mapapps.user}</username>
+                                    <password>${mapapps.pw}</password>
+                                    <token>${mapapps.token}</token>
+                                    <useChunkedRequestEncoding>${mapapps.useChunkedRequestEncoding}</useChunkedRequestEncoding>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <!-- Triggers a standalone export of the apps.
+            This profile should only be used together with the compressed profile.
+            Example:
+               mvn clean package -P compress,standalone
+            -->
+            <id>standalone</id>
+            <dependencies>
+                <!-- ensure the correct production dependencies are used during standalone export -->
+                <dependency>
+                    <groupId>de.conterra.mapapps</groupId>
+                    <artifactId>ct-mapapps-js-bom-prod</artifactId>
+                    <version>${apprt.version}</version>
+                    <type>pom</type>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>de.conterra.mapapps</groupId>
+                        <artifactId>mapapps-maven-plugin</artifactId>
+                        <version>${mapapps.version}</version>
+                        <executions>
+                            <execution>
+                                <id>create-standalone-apps</id>
+                                <goals>
+                                    <goal>standaloneApp</goal>
+                                </goals>
+                                <configuration>
+                                    <!-- Export target folder. All apps are exported into this folder. -->
+                                    <outputDirectory>${project.build.directory}/export</outputDirectory>
+                                    <!-- folder where the apps for export are located -->
+                                    <sourceDirectory>${project.build.directory}/webapp/js/apps</sourceDirectory>
+                                    <!-- (optional) regex which apps should be exported. By default all in the sourceDirectory. -->
+                                    <includePattern>.*</includePattern>
+                                    <!-- (optional) regex which apps should not be exported. By default empty. -->
+                                    <skipPattern></skipPattern>
+                                    <!-- (optional) folder to a local bundles directory, which is used as source of bundles. The bundles need to be compressed and have a dependencies.json. -->
+                                    <localBundlesDirectory>${project.build.directory}/webapp/js/bundles</localBundlesDirectory>
+                                    <!-- (optional) folder with custom index.html or config.js file of the exported app. -->
+                                    <standaloneTemplateOverride>${project.build.directory}/standalone-template</standaloneTemplateOverride>
+                                    <!-- (optional) read the application.properties as source for property replacement of the exported files -->
+                                    <applicationProperties>${project.build.directory}/test-classes/application.properties</applicationProperties>
+                                    <!-- (optional) define further replacement properties, this will overwrite settings from the application.properties -->
+                                    <replacementProperties>
+                                        <myproperty>xyz</myproperty>
+                                    </replacementProperties>
+                                    <!-- (optional) custom javascript modules included in the apps layer file
+                                        e.g. myBundle/someModule,myBundle/anotherModule
+                                     -->
+                                    <exportCustomModules>map-preload-2D</exportCustomModules>
+                                    <!-- (optional) custom files included in the export
+                                        e.g. myBundle/*.gif,myBundle/*.svg
+                                    -->
+                                    <exportCustomFiles></exportCustomFiles>
+
+                                    <!-- If true .js, .json and .css files are pre-compressed,
+                                      which means that .gz and .br variants of the files are added to the export.
+                                      Enable it only if your target server supports pre-compressed files.
+                                      The files are only compressed if the size of the file is bigger than the compressMinSize.
+                                      The compressMinSize is in bytes.
+                                    -->
+                                    <compressFiles>false</compressFiles>
+                                    <compressMinSize>512000</compressMinSize>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>write-release-versions</id>
+            <properties>
+                <replace.source.version>${project.version}</replace.source.version>
+                <replace.target.version>${project.version}</replace.target.version>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <!-- ensure correct version in the manifest.json files-->
+                        <groupId>com.google.code.maven-replacer-plugin</groupId>
+                        <artifactId>replacer</artifactId>
+                        <executions>
+                            <!-- set release version -->
+                            <execution>
+                                <id>Set Versions from ${replace.source.version} to ${replace.target.version}</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>replace</goal>
+                                </goals>
+                                <configuration>
+                                    <basedir>${basedir}</basedir>
+                                    <includes>
+                                        <include>src/main/js/**/manifest.json</include>
+                                    </includes>
+                                    <excludes>
+                                        <exclude>src/main/js/**/tests/**</exclude>
+                                    </excludes>
+                                    <regex>false</regex>
+                                    <replacements>
+                                        <replacement>
+                                            <token>"${replace.source.version}"</token>
+                                            <value>"${replace.target.version}"</value>
+                                        </replacement>
+                                        <replacement>
+                                            <token>"~${replace.source.version}"</token>
+                                            <value>"~${replace.target.version}"</value>
+                                        </replacement>
+                                        <replacement>
+                                            <token>^${replace.source.version}</token>
+                                            <value>^${replace.target.version}</value>
+                                        </replacement>
+                                    </replacements>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
