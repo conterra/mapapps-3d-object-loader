@@ -1,0 +1,672 @@
+/**
+ * Copyright (C) 2025 con terra GmbH (info@conterra.de)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/* All bundle rules are prefixed with `.vue-base` to reach a specificity of (0,3,0)+,
+   so they win over theme resets such as `.<theme> .vue-base *` (0,2,0) even if the
+   theme styles are injected later. The root rule uses a doubled
+   `.dn-3dobjectloader` class to reach (0,3,0) as well. */
+.vue-base .dn-3dobjectloader.dn-3dobjectloader {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 12px 16px 8px 16px;
+    box-sizing: border-box;
+    font-size: 13px;
+    overflow: hidden;
+}
+
+.vue-base .dn-3dobjectloader .step-info,
+.vue-base .dn-3dobjectloader .unit-info {
+    margin-bottom: 12px;
+    border-color: rgba(33, 150, 243, 0.35) !important;
+    background-color: rgba(227, 242, 253, 0.45) !important;
+}
+
+.vue-base .dn-3dobjectloader .unit-info {
+    margin-bottom: 6px;
+}
+
+.vue-base .dn-3dobjectloader .step-info .v-alert__content,
+.vue-base .dn-3dobjectloader .unit-info .v-alert__content {
+    color: #0a2f6e;
+    font-size: 12.5px;
+    font-weight: 500;
+}
+
+/* Themes may map `.info--text` (and `warning--text` / `success--text`) to a
+   light gray with `!important`. Vuetify puts these classes directly on alert
+   content and icons in outline mode, so the darker text colors below need
+   `!important` and a higher specificity. Scoped to alerts inside the bundle so
+   the theme classes stay untouched elsewhere. */
+.vue-base .dn-3dobjectloader .v-alert .info--text,
+.vue-base .dn-3dobjectloader .v-alert.info--text {
+    color: #0a2f6e !important;
+}
+
+.vue-base .dn-3dobjectloader .v-alert .warning--text,
+.vue-base .dn-3dobjectloader .v-alert.warning--text {
+    color: #8a3a00 !important;
+}
+
+.vue-base .dn-3dobjectloader .v-alert .success--text,
+.vue-base .dn-3dobjectloader .v-alert.success--text {
+    color: #14532b !important;
+}
+
+/* Stepper */
+.vue-base .dn-3dobjectloader .stepper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 0 12px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    margin-bottom: 10px;
+}
+
+.vue-base .dn-3dobjectloader .stepper .step {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(0, 0, 0, 0.45);
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.vue-base .dn-3dobjectloader .stepper .step-sep {
+    flex: 1;
+    height: 1px;
+    background-color: rgba(0, 0, 0, 0.15);
+    min-width: 12px;
+}
+
+.vue-base .dn-3dobjectloader .stepper .step .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.25);
+    color: white;
+    font-weight: 600;
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.vue-base .dn-3dobjectloader .stepper .step.active .num {
+    background-color: #3c506e;
+}
+
+.vue-base .dn-3dobjectloader .stepper .step.done .num {
+    background-color: #3c506e;
+    opacity: 0.7;
+}
+
+.vue-base .dn-3dobjectloader .stepper .step.active,
+.vue-base .dn-3dobjectloader .stepper .step.done {
+    color: rgba(0, 0, 0, 0.85);
+    font-weight: 500;
+}
+
+/* Content area */
+.vue-base .dn-3dobjectloader .step-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.vue-base .dn-3dobjectloader .step-content .section-heading {
+    font-size: 13px;
+    font-weight: 600;
+    margin: 6px 0 8px 0;
+    color: #37474f;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Button bar: pinned to the bottom of the widget. margin-top: auto pushes it to
+   the end of a short step-content; sticky keeps it visible while scrolling. */
+.vue-base .dn-3dobjectloader .button-bar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 0 4px 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    margin-top: auto;
+    position: sticky;
+    bottom: 0;
+    background-color: #fff;
+    z-index: 1;
+}
+
+/* Tablet sublayouts only: footer buttons may grow in height and wrap their
+   label, so long (e.g. German) labels do not overflow the button. Desktop and
+   mobile are intentionally unchanged.
+   Cause of the clipping: Vuetify's .v-btn__content is a flex row with
+   `flex: 1 0 auto` (no shrinking) and `white-space: nowrap`. The button shrinks
+   inside the bar, the content does not, so its text overflows. white-space or
+   overflow-wrap alone do not help as long as the content cannot shrink.
+   Fix: the content stays a flex row (icon next to the text, consistent for all
+   buttons) but gets `flex: 1 1 auto` + `min-width: 0` so it shrinks, plus
+   `white-space: normal` + `overflow-wrap: anywhere` so even long single words
+   wrap. `anywhere` (unlike `break-word`) lowers the min-content width of the
+   anonymous text item so it can shrink inside the flex container.
+   Specificity (0,6,0) wins over theme rules (0,3,0). */
+[class*="ctLayout_tablet_"] .vue-base .dn-3dobjectloader .button-bar .v-btn,
+[class*="ctLayout_tablet_"] .vue-base .dn-3dobjectloader .final-footer .v-btn {
+    height: auto;
+    min-height: 36px;
+    /* min-width as a floor: all buttons in the bar shrink proportionally, and
+       without it the short "back" button gets so narrow that its label breaks
+       character by character. Only short buttons hit the floor. */
+    min-width: 68px;
+    flex: 0 1 auto;
+    /* Narrower padding than Vuetify's 0 16px leaves more room for the label and
+       reduces wrapping (and the button width, so there is no overflow risk). */
+    padding: 2px 8px;
+}
+
+[class*="ctLayout_tablet_"] .vue-base .dn-3dobjectloader .button-bar .v-btn .v-btn__content,
+[class*="ctLayout_tablet_"] .vue-base .dn-3dobjectloader .final-footer .v-btn .v-btn__content {
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+/* Step 1: preset list */
+.vue-base .dn-3dobjectloader .source-tabs {
+    margin-bottom: 8px;
+}
+
+.vue-base .dn-3dobjectloader .preset-tab {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.vue-base .dn-3dobjectloader .preset-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 4px;
+}
+
+.vue-base .dn-3dobjectloader .preset-list .v-list__tile {
+    height: 44px;
+}
+
+.vue-base .dn-3dobjectloader .preset-list .preset-selected {
+    background-color: rgba(60, 80, 110, 0.08);
+}
+
+.vue-base .dn-3dobjectloader .preset-list .preset-selected .v-list__tile__title {
+    color: #3c506e;
+    font-weight: 500;
+}
+
+/* Step 1 read-only (edit mode): inactive presets are visibly disabled. */
+.vue-base .dn-3dobjectloader .preset-list .preset-readonly {
+    opacity: 0.45;
+    pointer-events: none;
+    cursor: default;
+}
+
+.vue-base .dn-3dobjectloader .thumb {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    background-color: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.vue-base .dn-3dobjectloader .thumb .thumb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.vue-base .dn-3dobjectloader .title-field {
+    font-size: 13px;
+}
+
+/* Step 1: custom upload */
+.vue-base .dn-3dobjectloader .drop-zone {
+    position: relative;
+    border: 2px dashed rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 12px 18px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s;
+    background-color: #fafafa;
+}
+
+.vue-base .dn-3dobjectloader .drop-zone.dragging {
+    background-color: rgba(33, 150, 243, 0.08);
+    border-color: #2196f3;
+}
+
+.vue-base .dn-3dobjectloader .drop-zone.has-file {
+    background-color: rgba(76, 175, 80, 0.08);
+    border-color: #4caf50;
+}
+
+/* Step 1 read-only (edit mode): the drop zone is disabled, the file cannot be replaced. */
+.vue-base .dn-3dobjectloader .drop-zone.drop-readonly {
+    cursor: default;
+    opacity: 0.75;
+}
+
+.vue-base .dn-3dobjectloader .drop-zone.drop-readonly:hover {
+    background-color: #fafafa;
+}
+
+.vue-base .dn-3dobjectloader .drop-zone.drop-readonly.has-file:hover {
+    background-color: rgba(76, 175, 80, 0.08);
+}
+
+.vue-base .dn-3dobjectloader .drop-zone .file-input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.vue-base .dn-3dobjectloader .drop-zone .drop-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.75);
+}
+
+.vue-base .dn-3dobjectloader .drop-zone .drop-subtitle {
+    color: rgba(0, 0, 0, 0.5);
+    font-size: 12px;
+}
+
+.vue-base .dn-3dobjectloader .drop-zone .badges {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.vue-base .dn-3dobjectloader .file-error {
+    color: #c62828;
+    background-color: #ffebee;
+    border: 1px solid #f44336;
+    padding: 6px 10px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    font-size: 12px;
+}
+
+.vue-base .dn-3dobjectloader .url-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 6px 0 4px 0;
+    color: rgba(0, 0, 0, 0.55);
+    font-weight: 500;
+    font-size: 12px;
+    text-align: center;
+}
+
+.vue-base .dn-3dobjectloader .url-divider::before,
+.vue-base .dn-3dobjectloader .url-divider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+/* Step 2 */
+.vue-base .dn-3dobjectloader .field-row {
+    display: grid;
+    gap: 8px;
+    align-items: center;
+}
+
+.vue-base .dn-3dobjectloader .position-row {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+.vue-base .dn-3dobjectloader .size-row {
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+}
+
+.vue-base .dn-3dobjectloader .size-row .chain {
+    color: rgba(0, 0, 0, 0.3);
+    transition: color 0.15s;
+}
+
+.vue-base .dn-3dobjectloader .size-row .chain.active {
+    color: #3c506e;
+}
+
+.vue-base .dn-3dobjectloader .position-section,
+.vue-base .dn-3dobjectloader .size-section,
+.vue-base .dn-3dobjectloader .scale-section {
+    margin-bottom: 18px;
+}
+
+.vue-base .dn-3dobjectloader .lock-row {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.vue-base .dn-3dobjectloader .lock-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.03);
+    color: rgba(0, 0, 0, 0.55);
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+    user-select: none;
+}
+
+.vue-base .dn-3dobjectloader .lock-toggle.locked {
+    background-color: #3c506e;
+    color: white;
+    border-color: #3c506e;
+}
+
+.vue-base .dn-3dobjectloader .lock-toggle.locked .v-icon {
+    color: white !important;
+}
+
+.vue-base .dn-3dobjectloader .scale-field {
+    max-width: 140px;
+}
+
+.vue-base .dn-3dobjectloader .distortion-warning {
+    margin-top: 12px;
+}
+
+.vue-base .dn-3dobjectloader .distortion-warning .v-alert__content {
+    color: #8a3a00;
+    font-weight: 500;
+}
+
+/* Hide number input spinners; Firefox shows them otherwise and they break the grid */
+.vue-base .dn-3dobjectloader input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.vue-base .dn-3dobjectloader input[type="number"]::-webkit-inner-spin-button,
+.vue-base .dn-3dobjectloader input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Step 3 */
+.vue-base .dn-3dobjectloader .step-3 .mask-illustration {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
+    background-color: #fafafa;
+    border-radius: 6px;
+    margin: 12px 0;
+}
+
+.vue-base .dn-3dobjectloader .step-3 .mask-actions {
+    display: flex;
+    justify-content: center;
+    margin: 8px 0;
+}
+
+/* Placing hint */
+.vue-base .dn-3dobjectloader .placing-hint {
+    margin-bottom: 10px;
+}
+
+.vue-base .dn-3dobjectloader .placing-alert {
+    border-color: #64b5f6 !important;
+    background-color: #e3f2fd !important;
+}
+
+.vue-base .dn-3dobjectloader .placing-alert-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    color: #072658;
+    font-weight: 500;
+}
+
+/* Final screen */
+.vue-base .dn-3dobjectloader .dn-3dobjectloader-final {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.vue-base .dn-3dobjectloader .final-banner {
+    border-color: #a5d6a7 !important;
+    background-color: #e8f5e9 !important;
+    margin-bottom: 0;
+    padding: 18px;
+    flex-shrink: 0;
+}
+
+.vue-base .dn-3dobjectloader .final-banner-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: center;
+}
+
+.vue-base .dn-3dobjectloader .final-banner-text {
+    color: #14532b;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.vue-base .dn-3dobjectloader .final-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 14px;
+}
+
+.vue-base .dn-3dobjectloader .final-question {
+    text-align: center;
+    margin-bottom: 14px;
+    color: rgba(0, 0, 0, 0.75);
+    font-weight: 600;
+}
+
+.vue-base .dn-3dobjectloader .final-primary {
+    display: flex;
+    justify-content: center;
+}
+
+.vue-base .dn-3dobjectloader .final-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 4px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    flex-shrink: 0;
+    margin-top: auto;
+}
+
+/* List view */
+.vue-base .dn-3dobjectloader .list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 0 10px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    margin-bottom: 8px;
+}
+
+.vue-base .dn-3dobjectloader .list-title {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.vue-base .dn-3dobjectloader .list-count {
+    color: rgba(0, 0, 0, 0.5);
+    font-weight: 400;
+}
+
+.vue-base .dn-3dobjectloader .placed-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.vue-base .dn-3dobjectloader .placed-list .placed-list-item.selected {
+    background-color: rgba(60, 80, 110, 0.08);
+}
+
+.vue-base .dn-3dobjectloader .placed-list .empty-hint {
+    opacity: 0.55;
+    font-style: italic;
+}
+
+/* Mobile sublayouts: collapsed grid, compact paddings, no labels. */
+
+[class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader {
+    padding: 8px 10px;
+    font-size: 12px;
+}
+
+[class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader .stepper .step .label {
+    display: none;
+}
+
+[class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader .position-row {
+    grid-template-columns: 1fr 1fr;
+}
+
+[class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader .size-row {
+    grid-template-columns: 1fr;
+    row-gap: 8px;
+}
+
+[class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader .size-row .chain {
+    display: none;
+}
+
+[class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader .drop-zone {
+    padding: 14px 10px;
+}
+
+[class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader .button-bar,
+[class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader .final-footer {
+    flex-wrap: wrap;
+    row-gap: 6px;
+}
+
+/* Mobile: the whole bundle scrolls, so undo the flex stretch of the preset
+   list; otherwise it would never get its own height and would compete with the
+   bundle scroll. */
+[class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader .preset-tab {
+    flex: 0 1 auto;
+    display: block;
+}
+
+[class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader .preset-list {
+    flex: 0 1 auto;
+    overflow: visible;
+}
+
+/* Mobile: the whole bundle scrolls, so the step header and the action bar do
+   not permanently occupy the short viewport. */
+[class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader.dn-3dobjectloader {
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+[class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader .step-content {
+    min-height: auto;
+    overflow: visible;
+}
+
+[class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader .button-bar {
+    position: static;
+    bottom: auto;
+    z-index: auto;
+}
+
+/* The window (`.dn-3dobjectloader-sheet`) is outside `.vue-base`, so no prefix. */
+.dn-3dobjectloader-sheet {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+}
+
+.ctLayout_mobile_portrait .dn-3dobjectloader-sheet {
+    height: 50vh !important;
+    top: auto !important;
+    bottom: 0 !important;
+}
+
+/* Landscape: left side panel at full height, 50vw wide, sticky at l: 0.
+   Overrides the shared sheet rule (top border radius / top shadow) with square
+   corners and a shadow to the right. */
+.ctLayout_mobile_landscape .dn-3dobjectloader-sheet {
+    width: 50vw !important;
+    height: auto !important;
+    left: 0 !important;
+    right: auto !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.15);
+}
+
+.icon-dn-3dobjectloader {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    background-image: url("./Icon.svg");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    vertical-align: middle;
+}
+
+.icon-dn-3dobjectloader::before {
+    content: "";
+}

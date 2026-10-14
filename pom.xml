@@ -21,8 +21,8 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.conterra.devnet</groupId>
-    <artifactId>mapapps-devnet-blueprint</artifactId>
-    <version>4.20.3-SNAPSHOT</version>
+    <artifactId>mapapps-3d-object-loader</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <dependencyManagement>
         <dependencies>
@@ -469,10 +469,10 @@
         </plugins>
     </build>
     <scm>
-        <connection>scm:git:https://github.com/conterra/mapapps-devnet-blueprint.git</connection>
-        <developerConnection>scm:git:https://github.com/conterra/mapapps-devnet-blueprint.git
+        <connection>scm:git:https://github.com/conterra/mapapps-3d-object-loader.git</connection>
+        <developerConnection>scm:git:https://github.com/conterra/mapapps-3d-object-loader.git
         </developerConnection>
-        <url>https://github.com/conterra/mapapps-devnet-blueprint</url>
+        <url>https://github.com/conterra/mapapps-3d-object-loader</url>
         <tag>HEAD</tag>
     </scm>
     <distributionManagement>

@@ -1,0 +1,388 @@
+{
+    "name": "dn_3dobjectloader",
+    "version": "1.0.0-SNAPSHOT",
+    "title": "${bundleName}",
+    "description": "${bundleDescription}",
+    "vendor": "con terra GmbH",
+    "productName": "devnet-mapapps-3d-object-loader",
+    "keywords": [
+        "3d",
+        "glb",
+        "gltf",
+        "scene",
+        "integrated mesh"
+    ],
+    "i18n": [
+        "bundle"
+    ],
+    "dependencies": {
+        "@arcgis/core": "^4.33.0",
+        "apprt-vue": "^4.20.0",
+        "apprt-vuetify": "^4.20.0",
+        "apprt-core": "^4.20.0",
+        "apprt-binding": "^4.20.0",
+        "map-widget": "^4.20.0",
+        "toc": "^4.20.0",
+        "parametermanager": "^4.20.0"
+    },
+    "cssThemesExtension": [
+        {
+            "name": "*",
+            "files": [
+                "./css/styles.css"
+            ]
+        }
+    ],
+    "layout-widgets": [
+        {
+            "widgetRole": "objectLoaderWidget",
+            "window": {
+                "title": "${ui.windowTitle}",
+                "dockTool": "objectLoaderToggleTool",
+                "minimizeOnClose": true,
+                "fixEdgesInViewPort": {
+                    "l": true,
+                    "r": false,
+                    "t": true,
+                    "b": true
+                },
+                "maxSize": {
+                    "w": 9999,
+                    "h": 725
+                },
+                "marginBox": {
+                    "w": 555,
+                    "t": 160,
+                    "l": 80,
+                    "b": 40
+                }
+            }
+        },
+        {
+            "widgetRole": "objectLoaderWidget",
+            "sublayout": [
+                "tablet_portrait",
+                "tablet_landscape"
+            ],
+            "nomerge": true,
+            "window": {
+                "title": "${ui.windowTitle}",
+                "dockTool": "objectLoaderToggleTool",
+                "minimizeOnClose": true,
+                "marginBox": {
+                    "w": 460,
+                    "h": 600,
+                    "t": 90,
+                    "l": 20
+                }
+            }
+        },
+        {
+            "widgetRole": "objectLoaderWidget",
+            "sublayout": [
+                "mobile_portrait"
+            ],
+            "nomerge": true,
+            "window": {
+                "title": "${ui.windowTitle}",
+                "dockTool": "objectLoaderToggleTool",
+                "dockingBar": "${id}-dockingBarBottomLeft",
+                "windowClass": "dn-3dobjectloader-sheet",
+                "minimizeOnClose": true,
+                "resizable": false,
+                "draggable": false,
+                "fixEdgesInViewPort": {
+                    "l": true,
+                    "r": true,
+                    "b": true
+                },
+                "marginBox": {
+                    "l": 0,
+                    "r": 0,
+                    "b": 0
+                }
+            }
+        },
+        {
+            "widgetRole": "objectLoaderWidget",
+            "sublayout": [
+                "mobile_landscape"
+            ],
+            "nomerge": true,
+            "window": {
+                "title": "${ui.windowTitle}",
+                "dockTool": "objectLoaderToggleTool",
+                "dockingBar": "${id}-dockingBarLeft",
+                "windowClass": "dn-3dobjectloader-sheet",
+                "minimizeOnClose": true,
+                "resizable": false,
+                "draggable": false,
+                "fixEdgesInViewPort": {
+                    "l": true,
+                    "t": true,
+                    "b": true
+                },
+                "marginBox": {
+                    "l": 0,
+                    "t": 0,
+                    "b": 0,
+                    "w": 480
+                }
+            }
+        }
+    ],
+    "components": [
+        {
+            "name": "ObjectsModel",
+            "provides": "dn_3dobjectloader.ObjectsModel"
+        },
+        {
+            "name": "ObjectsStorageController",
+            "provides": "dn_3dobjectloader.ObjectsStorageController",
+            "properties": {
+                "dbName": "dn_3dobjectloader",
+                "schemaVersion": 1,
+                "maxFileSize": 10485760
+            }
+        },
+        {
+            "name": "ObjectsMeshMaskManager",
+            "provides": "dn_3dobjectloader.ObjectsMeshMaskManager",
+            "properties": {
+                "meshLayerId": ""
+            },
+            "references": [
+                {
+                    "name": "_mapWidgetModel",
+                    "providing": "map-widget.MapWidgetModel"
+                }
+            ]
+        },
+        {
+            "name": "ObjectsSketchManager",
+            "provides": "dn_3dobjectloader.ObjectsSketchManager",
+            "references": [
+                {
+                    "name": "_mapWidgetModel",
+                    "providing": "map-widget.MapWidgetModel"
+                }
+            ]
+        },
+        {
+            "name": "ObjectsController",
+            "provides": "dn_3dobjectloader.ObjectsController",
+            "immediate": true,
+            "properties": {
+                "groupLayerId": "dn-3dobjectloader-group",
+                "highlightColor": [255, 235, 59, 1],
+                "includeDefaultPresets": true,
+                "presetModels": [],
+                "defaultPresetModels": [
+                    {
+                        "id": "wind_turbine",
+                        "name": "${presets.windTurbine}",
+                        "url": "resource('assets/models/wind_turbine.glb')",
+                        "thumbnail": "resource('assets/models/wind_turbine.png')",
+                        "license": {
+                            "copyright": "Kreis Recklinghausen (AdV CityGML sample data)",
+                            "fees": "Datenlizenz Deutschland – Zero – Version 2.0",
+                            "url": "https://www.govdata.de/dl-de/zero-2-0"
+                        }
+                    },
+                    {
+                        "id": "transmission_tower_18m",
+                        "name": "${presets.transmissionTower18}",
+                        "url": "resource('assets/models/transmission_tower_18m.glb')",
+                        "thumbnail": "resource('assets/models/transmission_tower_18m.png')",
+                        "license": {
+                            "copyright": "Kreis Recklinghausen (AdV CityGML sample data)",
+                            "fees": "Datenlizenz Deutschland – Zero – Version 2.0",
+                            "url": "https://www.govdata.de/dl-de/zero-2-0"
+                        }
+                    },
+                    {
+                        "id": "transmission_tower_45m",
+                        "name": "${presets.transmissionTower45}",
+                        "url": "resource('assets/models/transmission_tower_45m.glb')",
+                        "thumbnail": "resource('assets/models/transmission_tower_45m.png')",
+                        "license": {
+                            "copyright": "Kreis Recklinghausen (AdV CityGML sample data)",
+                            "fees": "Datenlizenz Deutschland – Zero – Version 2.0",
+                            "url": "https://www.govdata.de/dl-de/zero-2-0"
+                        }
+                    },
+                    {
+                        "id": "transmission_tower_65m",
+                        "name": "${presets.transmissionTower65}",
+                        "url": "resource('assets/models/transmission_tower_65m.glb')",
+                        "thumbnail": "resource('assets/models/transmission_tower_65m.png')",
+                        "license": {
+                            "copyright": "Kreis Recklinghausen (AdV CityGML sample data)",
+                            "fees": "Datenlizenz Deutschland – Zero – Version 2.0",
+                            "url": "https://www.govdata.de/dl-de/zero-2-0"
+                        }
+                    },
+                    {
+                        "id": "birch_tree",
+                        "name": "${presets.birchTree}",
+                        "url": "resource('assets/models/birch_tree.glb')",
+                        "thumbnail": "resource('assets/models/birch_tree.png')",
+                        "license": {
+                            "copyright": "CC0 1.0 Universal",
+                            "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+                        }
+                    },
+                    {
+                        "id": "pine",
+                        "name": "${presets.pine}",
+                        "url": "resource('assets/models/pine.glb')",
+                        "thumbnail": "resource('assets/models/pine.png')",
+                        "license": {
+                            "copyright": "CC0 1.0 Universal",
+                            "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+                        }
+                    },
+                    {
+                        "id": "cube",
+                        "name": "${presets.cube}",
+                        "url": "resource('assets/models/cube.glb')",
+                        "thumbnail": "resource('assets/models/cube.png')",
+                        "license": {
+                            "copyright": "CC0 1.0 Universal",
+                            "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+                        }
+                    }
+                ]
+            },
+            "references": [
+                {
+                    "name": "_mapWidgetModel",
+                    "providing": "map-widget.MapWidgetModel"
+                },
+                {
+                    "name": "_model",
+                    "providing": "dn_3dobjectloader.ObjectsModel"
+                },
+                {
+                    "name": "_storage",
+                    "providing": "dn_3dobjectloader.ObjectsStorageController"
+                },
+                {
+                    "name": "_meshMaskManager",
+                    "providing": "dn_3dobjectloader.ObjectsMeshMaskManager"
+                },
+                {
+                    "name": "_sketchManager",
+                    "providing": "dn_3dobjectloader.ObjectsSketchManager"
+                },
+                {
+                    "name": "_tool",
+                    "providing": "ct.tools.Tool",
+                    "filter": "(id=objectLoaderToggleTool)"
+                }
+            ]
+        },
+        {
+            "name": "ObjectsIntegrationAPI",
+            "provides": "dn_3dobjectloader.ObjectsIntegrationAPI",
+            "references": [
+                {
+                    "name": "_controller",
+                    "providing": "dn_3dobjectloader.ObjectsController"
+                }
+            ]
+        },
+        {
+            "name": "ObjectsParameterResolver",
+            "provides": [
+                "parametermanager.Parametrizable"
+            ],
+            "properties": {
+                "restoreStrategy": "replace"
+            },
+            "references": [
+                {
+                    "name": "_controller",
+                    "providing": "dn_3dobjectloader.ObjectsController"
+                }
+            ]
+        },
+        {
+            "name": "ObjectsWidgetFactory",
+            "provides": "dijit.Widget",
+            "instanceFactory": true,
+            "properties": {
+                "widgetRole": "objectLoaderWidget"
+            },
+            "references": [
+                {
+                    "name": "_model",
+                    "providing": "dn_3dobjectloader.ObjectsModel"
+                },
+                {
+                    "name": "_controller",
+                    "providing": "dn_3dobjectloader.ObjectsController"
+                }
+            ]
+        },
+        {
+            "name": "ObjectsZoomActionDefinitionFactory",
+            "provides": "toc.ActionDefinitionFactory",
+            "references": [
+                {
+                    "name": "_mapWidgetModel",
+                    "providing": "map-widget.MapWidgetModel"
+                }
+            ]
+        },
+        {
+            "name": "ObjectsEditActionDefinitionFactory",
+            "provides": "toc.ActionDefinitionFactory",
+            "references": [
+                {
+                    "name": "_controller",
+                    "providing": "dn_3dobjectloader.ObjectsController"
+                },
+                {
+                    "name": "_mapWidgetModel",
+                    "providing": "map-widget.MapWidgetModel"
+                }
+            ]
+        },
+        {
+            "name": "ObjectsDeleteActionDefinitionFactory",
+            "provides": "toc.ActionDefinitionFactory",
+            "references": [
+                {
+                    "name": "_controller",
+                    "providing": "dn_3dobjectloader.ObjectsController"
+                },
+                {
+                    "name": "_mapWidgetModel",
+                    "providing": "map-widget.MapWidgetModel"
+                }
+            ]
+        },
+        {
+            "name": "ObjectsToggleTool",
+            "impl": "ct/tools/Tool",
+            "provides": [
+                "ct.tools.Tool"
+            ],
+            "propertiesConstructor": true,
+            "properties": {
+                "id": "objectLoaderToggleTool",
+                "title": "${tool.title}",
+                "tooltip": "${tool.tooltip}",
+                "iconClass": "icon-dn-3dobjectloader",
+                "toolRole": "toolset",
+                "togglable": true,
+                "rules": {
+                    "viewmode": "3D",
+                    "ruleSuccessProperty": "visibility",
+                    "noGroup": true
+                }
+            }
+        }
+    ]
+}
