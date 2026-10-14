@@ -22,20 +22,22 @@ To make the functions of this bundle available to the user, the following tool c
 Sample
 
 ```json
-"dn_3dobjectloader": {
-    "ObjectsController": {
-        "includeDefaultPresets": true,
-        "presetModels": [
-            {
-                "id": "garage",
-                "name": "Garage",
-                "url": "resource('${app}:/assets/models/garage.glb')",
-                "thumbnail": "resource('${app}:/assets/models/garage.png')"
-            }
-        ]
-    },
-    "ObjectsMeshMaskManager": {
-        "meshLayerId": "mesh"
+{
+    "dn_3dobjectloader": {
+        "ObjectsController": {
+            "includeDefaultPresets": true,
+            "presetModels": [
+                {
+                    "id": "garage",
+                    "name": "Garage",
+                    "url": "resource('${app}:/assets/models/garage.glb')",
+                    "thumbnail": "resource('${app}:/assets/models/garage.png')"
+                }
+            ]
+        },
+        "ObjectsMeshMaskManager": {
+            "meshLayerId": "mesh"
+        }
     }
 }
 ```
