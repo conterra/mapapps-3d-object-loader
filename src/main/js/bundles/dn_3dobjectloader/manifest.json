@@ -228,8 +228,9 @@
                         "url": "resource('assets/models/birch_tree.glb')",
                         "thumbnail": "resource('assets/models/birch_tree.png')",
                         "license": {
-                            "copyright": "CC0 1.0 Universal",
-                            "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+                            "copyright": "con terra GmbH",
+                            "fees": "Apache License 2.0",
+                            "url": "https://www.apache.org/licenses/LICENSE-2.0"
                         }
                     },
                     {
@@ -238,8 +239,9 @@
                         "url": "resource('assets/models/pine.glb')",
                         "thumbnail": "resource('assets/models/pine.png')",
                         "license": {
-                            "copyright": "CC0 1.0 Universal",
-                            "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+                            "copyright": "con terra GmbH",
+                            "fees": "Apache License 2.0",
+                            "url": "https://www.apache.org/licenses/LICENSE-2.0"
                         }
                     },
                     {
@@ -248,8 +250,9 @@
                         "url": "resource('assets/models/cube.glb')",
                         "thumbnail": "resource('assets/models/cube.png')",
                         "license": {
-                            "copyright": "CC0 1.0 Universal",
-                            "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+                            "copyright": "con terra GmbH",
+                            "fees": "Apache License 2.0",
+                            "url": "https://www.apache.org/licenses/LICENSE-2.0"
                         }
                     }
                 ]
