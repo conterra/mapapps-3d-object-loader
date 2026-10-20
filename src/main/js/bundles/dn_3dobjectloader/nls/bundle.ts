@@ -34,7 +34,7 @@ const i18n = {
                 info: "Add prefabricated or own 3D objects temporarily."
             },
             "2": {
-                label: "align",
+                label: "Align",
                 info: "Position the 3D object using the input fields or on the map."
             },
             "3": {
@@ -48,6 +48,7 @@ const i18n = {
             glbUnitInfo: "By default, one unit in the .glb file is rendered as one meter. Please consider this when creating and uploading the file.",
             dropTitle: "Drop GLB file here",
             dropSubtitle: "or click to choose",
+            removeUpload: "Remove file",
             formatBadge: ".glb format",
             maxSizeBadge: "Max. {maxSize} MB",
             urlAlternative: "Alternatively specify the URL",

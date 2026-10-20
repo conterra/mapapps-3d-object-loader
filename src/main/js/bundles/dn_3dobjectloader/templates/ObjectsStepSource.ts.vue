@@ -181,7 +181,7 @@
                         >
                             material-icon-close
                         </v-icon>
-                        {{ i18n.step1.dropTitle }}
+                        {{ i18n.step1.removeUpload }}
                     </v-btn>
                 </template>
             </div>

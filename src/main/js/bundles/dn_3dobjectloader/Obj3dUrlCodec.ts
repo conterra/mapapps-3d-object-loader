@@ -106,12 +106,40 @@ export function decodeCompact(raw: string | string[] | undefined): CompactItem[]
     if (!payload || payload.v !== FORMAT_VERSION || !Array.isArray(payload.o)) {
         return [];
     }
-    // Drop items lacking a preset id or valid coordinates — the input is a
-    // user-editable URL, so a manipulated payload must not yield NaN/undefined
-    // positions downstream.
-    return payload.o.filter((it): it is CompactItem =>
-        !!it &&
-        typeof it.p === "string" &&
-        Number.isFinite(it.x) && Number.isFinite(it.y) && Number.isFinite(it.z)
-    );
+    // The input is a user-editable URL, so a manipulated payload must not yield
+    // NaN/undefined values downstream. Items with an invalid required field are
+    // dropped; an invalid optional title or mask is removed from the item.
+    return payload.o.filter(isValidItem).map(sanitizeOptionalFields);
+}
+
+function isFiniteNumber(value: unknown): value is number {
+    return typeof value === "number" && Number.isFinite(value);
+}
+
+function isValidItem(it: unknown): it is CompactItem {
+    if (!it || typeof it !== "object") return false;
+    const c = it as Partial<CompactItem>;
+    return typeof c.p === "string" &&
+        isFiniteNumber(c.x) && isFiniteNumber(c.y) && isFiniteNumber(c.z) &&
+        isFiniteNumber(c.h) &&
+        isFiniteNumber(c.w) && c.w >= 0 &&
+        isFiniteNumber(c.d) && c.d >= 0 &&
+        isFiniteNumber(c.e) && c.e >= 0 &&
+        isFiniteNumber(c.s) && c.s > 0;
+}
+
+function isValidMask(m: unknown): m is CompactItem["m"] {
+    if (!m || typeof m !== "object") return false;
+    const { r, mh } = m as { r?: unknown; mh?: unknown };
+    return isFiniteNumber(mh) &&
+        Array.isArray(r) && r.length > 0 &&
+        r.every(ring => Array.isArray(ring) && ring.length >= 3 &&
+            ring.every(pt => Array.isArray(pt) && pt.length === 2 && isFiniteNumber(pt[0]) && isFiniteNumber(pt[1])));
+}
+
+function sanitizeOptionalFields(it: CompactItem): CompactItem {
+    const result = { ...it };
+    if (result.t !== undefined && typeof result.t !== "string") delete result.t;
+    if (result.m !== undefined && !isValidMask(result.m)) delete result.m;
+    return result;
 }

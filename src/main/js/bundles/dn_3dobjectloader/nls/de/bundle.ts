@@ -35,7 +35,7 @@ export default {
             info: "Fügen Sie vorgefertigte oder eigene 3D-Objekte temporär ein."
         },
         "2": {
-            label: "align",
+            label: "Ausrichten",
             info: "Positionieren Sie das 3D-Objekt über die Eingabefelder oder in der Karte."
         },
         "3": {
@@ -49,6 +49,7 @@ export default {
         glbUnitInfo: "Standardmäßig wird eine Einheit in der glb-Datei als ein Meter dargestellt. Beachten Sie dies beim Erstellen und Hochladen der Datei.",
         dropTitle: "GLB-Datei hier ablegen",
         dropSubtitle: "oder klicken zum Auswählen",
+        removeUpload: "Datei entfernen",
         formatBadge: ".glb Format",
         maxSizeBadge: "Max. {maxSize} MB",
         urlAlternative: "Alternativ die URL angeben",
@@ -77,7 +78,7 @@ export default {
         heightLabel: "Höhe des Planungsbereichs"
     },
     buttons: {
-        align: "align",
+        align: "ausrichten",
         planningArea: "Planungsbereich",
         back: "zurück",
         reset: "zurücksetzen",

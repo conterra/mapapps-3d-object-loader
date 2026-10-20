@@ -51,7 +51,6 @@ Sample
 | presetModels          | Array    |                                | ```[]```                        | Additional objects for placement (see below). They are listed after the prefabricated objects of the bundle. An entry with the `id` of a prefabricated object replaces it.                       |
 | includeDefaultPresets | Boolean  | ```true``` &#124; ```false```  | ```true```                      | Set to `false` to offer only the `presetModels`. Without `presetModels`, users can then only upload their own files.                                                                             |
 | groupLayerId          | String   |                                | ```"dn-3dobjectloader-group"``` | Id of the group layer that holds the placed objects. It is created automatically. Declare a `GROUP` layer with this id in `map-init` to control its title and position in the table of contents. |
-| spatialReferenceWkid  | Number   |                                | spatial reference of the map    | Only needed if objects have to be stored in a spatial reference that differs from the map. See [Spatial reference](#spatial-reference).                                                          |
 | highlightColor        | Number[] | ```[r, g, b, a]```             | ```[255, 235, 59, 1]```         | Highlight color of the selected object.                                                                                                                                                          |
 
 Properties of a preset model:

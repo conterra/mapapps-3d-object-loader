@@ -76,5 +76,43 @@ describe("dn_3dobjectloader/tests/Obj3dUrlCodec", function () {
             assert.lengthOf(decoded, 1);
             assert.equal(decoded[0].p, "cube");
         });
+
+        it("drops items with invalid heading, size or scale", function () {
+            const raw = JSON.stringify({
+                v: FORMAT_VERSION,
+                o: [
+                    item(),
+                    { ...item(), h: "90" },
+                    { ...item(), w: -1 },
+                    { ...item(), d: null },
+                    { ...item(), e: "x" },
+                    { ...item(), s: 0 },
+                    { ...item(), s: undefined }
+                ]
+            });
+            assert.lengthOf(decodeCompact(raw), 1);
+        });
+
+        it("removes an invalid title or mask but keeps the item", function () {
+            const ring = [[0, 0], [1, 0], [1, 1], [0, 0]];
+            const raw = JSON.stringify({
+                v: FORMAT_VERSION,
+                o: [
+                    { ...item(), t: 42 },
+                    { ...item(), m: { r: [ring], mh: "1" } },
+                    { ...item(), m: { r: [[[0, "a"], [1, 0], [1, 1]]], mh: 1 } },
+                    { ...item(), m: { r: [], mh: 1 } },
+                    { ...item(), t: "Garage", m: { r: [ring], mh: 1 } }
+                ]
+            });
+            const decoded = decodeCompact(raw);
+            assert.lengthOf(decoded, 5);
+            assert.notProperty(decoded[0], "t");
+            assert.notProperty(decoded[1], "m");
+            assert.notProperty(decoded[2], "m");
+            assert.notProperty(decoded[3], "m");
+            assert.equal(decoded[4].t, "Garage");
+            assert.deepEqual(decoded[4].m, { r: [ring], mh: 1 });
+        });
     });
 });

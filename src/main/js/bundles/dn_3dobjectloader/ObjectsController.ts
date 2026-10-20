@@ -62,7 +62,6 @@ interface ToggleTool {
 export default class ObjectsController {
     private declare _properties: {
         groupLayerId: string;
-        spatialReferenceWkid?: number;
         highlightColor: number[];
         /** Presets shipped with the bundle. */
         defaultPresetModels?: PresetModel[];
@@ -94,8 +93,8 @@ export default class ObjectsController {
     private _activated = false;
     /** Guards the shared-URL restore against running more than once. */
     private _sharedRestoreDone = false;
-    /** Cache for the spatial reference built from `spatialReferenceWkid`. */
-    private _configuredSpatialReference: SpatialReference | undefined;
+    /** True while {@link placeAt} is running; blocks a second placement by a fast double click. */
+    private _placing = false;
     /** Holds a decoded URL state that arrived before {@link activate} completed. */
     private _pendingShared: { items: CompactItem[]; strategy: RestoreStrategy } | null = null;
 
@@ -142,17 +141,9 @@ export default class ObjectsController {
     }
 
     /**
-     * @returns The spatial reference of the configured `spatialReferenceWkid`,
-     *          otherwise the map widget's spatial reference.
+     * @returns The spatial reference of the map. Placed objects always use it.
      */
     private _getSpatialReference(): SpatialReference | undefined {
-        const wkid = this._properties?.spatialReferenceWkid;
-        if (wkid) {
-            if (this._configuredSpatialReference?.wkid !== wkid) {
-                this._configuredSpatialReference = new SpatialReference({ wkid });
-            }
-            return this._configuredSpatialReference;
-        }
         return this._mapWidgetModel?.spatialReference ?? this._mapWidgetModel?.view?.spatialReference ?? undefined;
     }
 
@@ -346,6 +337,16 @@ export default class ObjectsController {
      * @returns The freshly placed item, or `undefined` if no valid source is set.
      */
     async placeAt(point: Point): Promise<ObjectItem | undefined> {
+        if (!this._model || this._placing) return undefined;
+        this._placing = true;
+        try {
+            return await this._placeAt(point);
+        } finally {
+            this._placing = false;
+        }
+    }
+
+    private async _placeAt(point: Point): Promise<ObjectItem | undefined> {
         const model = this._model;
         if (!model) return undefined;
         // The view (and with it the spatial reference) may not have existed at activation.

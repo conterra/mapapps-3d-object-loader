@@ -96,9 +96,11 @@ export default class IdbAdapter {
         const db = await this._open();
         return new Promise<void>((resolve, reject) => {
             const tx = db.transaction(BLOBS_STORE, "readwrite");
-            const req = tx.objectStore(BLOBS_STORE).put(blob, key);
-            req.onsuccess = () => resolve();
-            req.onerror = () => reject(req.error);
+            tx.objectStore(BLOBS_STORE).put(blob, key);
+            // Resolve only once the write is committed, not when the request succeeds.
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error);
+            tx.onabort = () => reject(tx.error);
         });
     }
 
@@ -107,9 +109,10 @@ export default class IdbAdapter {
         const db = await this._open();
         return new Promise<void>((resolve, reject) => {
             const tx = db.transaction(BLOBS_STORE, "readwrite");
-            const req = tx.objectStore(BLOBS_STORE).delete(key);
-            req.onsuccess = () => resolve();
-            req.onerror = () => reject(req.error);
+            tx.objectStore(BLOBS_STORE).delete(key);
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error);
+            tx.onabort = () => reject(tx.error);
         });
     }
 
