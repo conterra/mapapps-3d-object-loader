@@ -62,7 +62,10 @@
                         class="step"
                         :class="{ active: String(workflowStep) === n, done: isStepDone(n) }"
                     >
-                        <span class="num">{{ n }}</span>
+                        <span
+                            class="num"
+                            :class="{ primary: String(workflowStep) === n || isStepDone(n) }"
+                        >{{ n }}</span>
                         <span class="label">{{ i18n.steps[n].label }}</span>
                     </div>
                     <span

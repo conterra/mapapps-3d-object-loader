@@ -30,39 +30,27 @@
 .vue-base .dn-3dobjectloader .step-info,
 .vue-base .dn-3dobjectloader .unit-info {
     margin-bottom: 12px;
-    border-color: rgba(33, 150, 243, 0.35) !important;
-    background-color: rgba(227, 242, 253, 0.45) !important;
 }
 
 .vue-base .dn-3dobjectloader .unit-info {
     margin-bottom: 6px;
 }
 
-.vue-base .dn-3dobjectloader .step-info .v-alert__content,
-.vue-base .dn-3dobjectloader .unit-info .v-alert__content {
-    color: #0a2f6e;
+/* Vuetify 1.5 renders the alert text as a plain `div` next to `.v-alert__icon`. */
+.vue-base .dn-3dobjectloader .step-info > div,
+.vue-base .dn-3dobjectloader .unit-info > div {
     font-size: 12.5px;
-    font-weight: 500;
 }
 
-/* Themes may map `.info--text` (and `warning--text` / `success--text`) to a
-   light gray with `!important`. Vuetify puts these classes directly on alert
-   content and icons in outline mode, so the darker text colors below need
-   `!important` and a higher specificity. Scoped to alerts inside the bundle so
-   the theme classes stay untouched elsewhere. */
-.vue-base .dn-3dobjectloader .v-alert .info--text,
-.vue-base .dn-3dobjectloader .v-alert.info--text {
-    color: #0a2f6e !important;
-}
-
-.vue-base .dn-3dobjectloader .v-alert .warning--text,
-.vue-base .dn-3dobjectloader .v-alert.warning--text {
-    color: #8a3a00 !important;
-}
-
-.vue-base .dn-3dobjectloader .v-alert .success--text,
-.vue-base .dn-3dobjectloader .v-alert.success--text {
-    color: #14532b !important;
+/* Readable alert text. The map.apps themes set `.info--text` to a light gray
+   (e.g. `silver`) and `.warning--text` to orange with `!important`, which is
+   about 2:1 contrast on a light background (WCAG AA needs 4.5:1). Vuetify puts
+   these classes on outline alerts, so the text would inherit them. Only the
+   text gets the standard dark text color; icon and border keep the theme
+   color that signals the alert type. */
+.vue-base .dn-3dobjectloader .v-alert > div,
+.vue-base .dn-3dobjectloader .v-alert > div * {
+    color: rgba(0, 0, 0, 0.87) !important;
 }
 
 /* Stepper */
@@ -99,18 +87,13 @@
     height: 22px;
     border-radius: 50%;
     background-color: rgba(0, 0, 0, 0.25);
-    color: white;
+    color: #fff;
     font-weight: 600;
     font-size: 12px;
     flex-shrink: 0;
 }
 
-.vue-base .dn-3dobjectloader .stepper .step.active .num {
-    background-color: #3c506e;
-}
-
 .vue-base .dn-3dobjectloader .stepper .step.done .num {
-    background-color: #3c506e;
     opacity: 0.7;
 }
 
@@ -120,40 +103,44 @@
     font-weight: 500;
 }
 
-/* Content area */
-.vue-base .dn-3dobjectloader .step-content {
+/* Content area: each step is a column of a scrolling body and a fixed button
+   bar, so the bar needs no own background to stay visible. */
+.vue-base .dn-3dobjectloader .step-content,
+.vue-base .dn-3dobjectloader .dn-3dobjectloader-list-view {
     flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding-right: 4px;
     display: flex;
     flex-direction: column;
     min-height: 0;
+    overflow: hidden;
+}
+
+.vue-base .dn-3dobjectloader .step-body {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden auto;
+    padding-right: 4px;
 }
 
 .vue-base .dn-3dobjectloader .step-content .section-heading {
     font-size: 13px;
     font-weight: 600;
     margin: 6px 0 8px 0;
-    color: #37474f;
     display: flex;
     align-items: center;
     gap: 6px;
 }
 
-/* Button bar: pinned to the bottom of the widget. margin-top: auto pushes it to
-   the end of a short step-content; sticky keeps it visible while scrolling. */
+/* Button bar: last child of the step column, below the scrolling body. */
 .vue-base .dn-3dobjectloader .button-bar {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     gap: 4px;
     padding: 10px 0 4px 0;
     border-top: 1px solid rgba(0, 0, 0, 0.08);
     margin-top: auto;
-    position: sticky;
-    bottom: 0;
-    background-color: #fff;
-    z-index: 1;
 }
 
 /* Tablet sublayouts only: footer buttons may grow in height and wrap their
@@ -216,11 +203,10 @@
 }
 
 .vue-base .dn-3dobjectloader .preset-list .preset-selected {
-    background-color: rgba(60, 80, 110, 0.08);
+    background-color: rgba(0, 0, 0, 0.06);
 }
 
 .vue-base .dn-3dobjectloader .preset-list .preset-selected .v-list__tile__title {
-    color: #3c506e;
     font-weight: 500;
 }
 
@@ -235,7 +221,7 @@
     width: 36px;
     height: 36px;
     border-radius: 6px;
-    background-color: #f5f5f5;
+    background-color: rgba(0, 0, 0, 0.04);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -267,31 +253,21 @@
     gap: 4px;
     cursor: pointer;
     transition: background-color 0.15s, border-color 0.15s;
-    background-color: #fafafa;
 }
 
 .vue-base .dn-3dobjectloader .drop-zone.dragging {
-    background-color: rgba(33, 150, 243, 0.08);
-    border-color: #2196f3;
+    background-color: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.45);
 }
 
 .vue-base .dn-3dobjectloader .drop-zone.has-file {
-    background-color: rgba(76, 175, 80, 0.08);
-    border-color: #4caf50;
+    border-style: solid;
 }
 
 /* Step 1 read-only (edit mode): the drop zone is disabled, the file cannot be replaced. */
 .vue-base .dn-3dobjectloader .drop-zone.drop-readonly {
     cursor: default;
     opacity: 0.75;
-}
-
-.vue-base .dn-3dobjectloader .drop-zone.drop-readonly:hover {
-    background-color: #fafafa;
-}
-
-.vue-base .dn-3dobjectloader .drop-zone.drop-readonly.has-file:hover {
-    background-color: rgba(76, 175, 80, 0.08);
 }
 
 .vue-base .dn-3dobjectloader .drop-zone .file-input {
@@ -319,16 +295,7 @@
 }
 
 .vue-base .dn-3dobjectloader .file-error {
-    color: #c62828;
-    background-color: #ffebee;
-    border: 1px solid #f44336;
-    padding: 6px 10px;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
     margin-top: 8px;
-    font-size: 12px;
 }
 
 .vue-base .dn-3dobjectloader .url-divider {
@@ -365,12 +332,7 @@
 }
 
 .vue-base .dn-3dobjectloader .size-row .chain {
-    color: rgba(0, 0, 0, 0.3);
     transition: color 0.15s;
-}
-
-.vue-base .dn-3dobjectloader .size-row .chain.active {
-    color: #3c506e;
 }
 
 .vue-base .dn-3dobjectloader .position-section,
@@ -385,28 +347,7 @@
 }
 
 .vue-base .dn-3dobjectloader .lock-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 12px;
-    border-radius: 999px;
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    background-color: rgba(0, 0, 0, 0.03);
-    color: rgba(0, 0, 0, 0.55);
-    font-size: 12px;
-    cursor: pointer;
-    transition: background-color 0.15s, color 0.15s, border-color 0.15s;
-    user-select: none;
-}
-
-.vue-base .dn-3dobjectloader .lock-toggle.locked {
-    background-color: #3c506e;
-    color: white;
-    border-color: #3c506e;
-}
-
-.vue-base .dn-3dobjectloader .lock-toggle.locked .v-icon {
-    color: white !important;
+    text-transform: none;
 }
 
 .vue-base .dn-3dobjectloader .scale-field {
@@ -415,11 +356,6 @@
 
 .vue-base .dn-3dobjectloader .distortion-warning {
     margin-top: 12px;
-}
-
-.vue-base .dn-3dobjectloader .distortion-warning .v-alert__content {
-    color: #8a3a00;
-    font-weight: 500;
 }
 
 /* Hide number input spinners; Firefox shows them otherwise and they break the grid */
@@ -435,16 +371,6 @@
 }
 
 /* Step 3 */
-.vue-base .dn-3dobjectloader .step-3 .mask-illustration {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px 0;
-    background-color: #fafafa;
-    border-radius: 6px;
-    margin: 12px 0;
-}
-
 .vue-base .dn-3dobjectloader .step-3 .mask-actions {
     display: flex;
     justify-content: center;
@@ -456,16 +382,10 @@
     margin-bottom: 10px;
 }
 
-.vue-base .dn-3dobjectloader .placing-alert {
-    border-color: #64b5f6 !important;
-    background-color: #e3f2fd !important;
-}
-
 .vue-base .dn-3dobjectloader .placing-alert-body {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    color: #072658;
     font-weight: 500;
 }
 
@@ -478,8 +398,6 @@
 }
 
 .vue-base .dn-3dobjectloader .final-banner {
-    border-color: #a5d6a7 !important;
-    background-color: #e8f5e9 !important;
     margin-bottom: 0;
     padding: 18px;
     flex-shrink: 0;
@@ -493,7 +411,6 @@
 }
 
 .vue-base .dn-3dobjectloader .final-banner-text {
-    color: #14532b;
     font-weight: 700;
     font-size: 15px;
 }
@@ -554,7 +471,7 @@
 }
 
 .vue-base .dn-3dobjectloader .placed-list .placed-list-item.selected {
-    background-color: rgba(60, 80, 110, 0.08);
+    background-color: rgba(0, 0, 0, 0.06);
 }
 
 .vue-base .dn-3dobjectloader .placed-list .empty-hint {
@@ -612,23 +529,19 @@
 /* Mobile: the whole bundle scrolls, so the step header and the action bar do
    not permanently occupy the short viewport. */
 [class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader.dn-3dobjectloader {
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden auto;
     -webkit-overflow-scrolling: touch;
 }
 
-[class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader .step-content {
+[class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader .step-content,
+[class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader .step-body {
     min-height: auto;
     overflow: visible;
 }
 
-[class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader .button-bar {
-    position: static;
-    bottom: auto;
-    z-index: auto;
-}
-
-/* The window (`.dn-3dobjectloader-sheet`) is outside `.vue-base`, so no prefix. */
+/* The window (`.dn-3dobjectloader-sheet`) is outside `.vue-base`, so no prefix.
+   `!important` is needed below: the window manager sets the window position and
+   size as inline styles. */
 .dn-3dobjectloader-sheet {
     border-top-left-radius: 12px;
     border-top-right-radius: 12px;
@@ -648,25 +561,7 @@
 .ctLayout_mobile_landscape .dn-3dobjectloader-sheet {
     width: 50vw !important;
     height: auto !important;
-    left: 0 !important;
-    right: auto !important;
-    top: 0 !important;
-    bottom: 0 !important;
+    inset: 0 auto 0 0 !important;
     border-radius: 0 !important;
     box-shadow: 4px 0 16px rgba(0, 0, 0, 0.15);
-}
-
-.icon-dn-3dobjectloader {
-    display: inline-block;
-    width: 28px;
-    height: 28px;
-    background-image: url("./Icon.svg");
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    vertical-align: middle;
-}
-
-.icon-dn-3dobjectloader::before {
-    content: "";
 }

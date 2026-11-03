@@ -17,214 +17,215 @@
 -->
 <template>
     <div class="step-content step-1">
-        <v-tabs
-            :value="sourceTab"
-            slider-color="primary"
-            class="source-tabs"
-            :class="{ 'tabs-readonly': editMode }"
-            @input="onSourceTabChange"
-        >
-            <v-tab :disabled="editMode && sourceTab !== 0">
-                {{ i18n.step1.tabPreset }}
-            </v-tab>
-            <v-tab :disabled="editMode && sourceTab !== 1">
-                {{ i18n.step1.tabCustom }}
-            </v-tab>
-        </v-tabs>
-
-        <div
-            v-if="sourceTab === 0"
-            class="preset-tab"
-        >
-            <v-list
-                dense
-                class="preset-list"
+        <div class="step-body">
+            <v-tabs
+                :value="sourceTab"
+                slider-color="primary"
+                class="source-tabs"
+                :class="{ 'tabs-readonly': editMode }"
+                @change="onSourceTabChange"
             >
-                <v-list-tile
-                    v-for="p in presets"
-                    :key="p.id"
-                    :class="{
-                        'preset-selected': activePresetId === p.id,
-                        'preset-readonly': editMode && activePresetId !== p.id
-                    }"
-                    @click="onSelectPreset(p)"
+                <v-tab :disabled="editMode && sourceTab !== 0">
+                    {{ i18n.step1.tabPreset }}
+                </v-tab>
+                <v-tab :disabled="editMode && sourceTab !== 1">
+                    {{ i18n.step1.tabCustom }}
+                </v-tab>
+            </v-tabs>
+
+            <div
+                v-if="sourceTab === 0"
+                class="preset-tab"
+            >
+                <v-list
+                    dense
+                    class="preset-list"
                 >
-                    <v-list-tile-avatar>
-                        <div class="thumb">
-                            <img
-                                v-if="p.thumbnail"
-                                :src="p.thumbnail"
-                                :alt="p.name"
-                                class="thumb-img"
-                            >
-                            <v-icon
-                                v-else
-                                color="grey darken-2"
-                                small
-                            >
-                                material-icon-3d_rotation
+                    <v-list-tile
+                        v-for="p in presets"
+                        :key="p.id"
+                        :class="{
+                            'preset-selected': activePresetId === p.id,
+                            'preset-readonly': editMode && activePresetId !== p.id
+                        }"
+                        @click="onSelectPreset(p)"
+                    >
+                        <v-list-tile-avatar>
+                            <div class="thumb">
+                                <img
+                                    v-if="p.thumbnail"
+                                    :src="p.thumbnail"
+                                    :alt="p.name"
+                                    class="thumb-img"
+                                >
+                                <v-icon
+                                    v-else
+                                    color="grey darken-2"
+                                    small
+                                >
+                                    material-icon-3d_rotation
+                                </v-icon>
+                            </div>
+                        </v-list-tile-avatar>
+                        <v-list-tile-content>
+                            <v-list-tile-title :class="{ 'primary--text': activePresetId === p.id }">
+                                {{ p.name }}
+                            </v-list-tile-title>
+                        </v-list-tile-content>
+                        <v-list-tile-action v-if="activePresetId === p.id">
+                            <v-icon color="primary">
+                                material-icon-check_circle
                             </v-icon>
+                        </v-list-tile-action>
+                    </v-list-tile>
+                </v-list>
+            </div>
+
+            <div
+                v-else
+                class="custom-tab"
+            >
+                <v-alert
+                    type="info"
+                    outline
+                    dense
+                    class="unit-info"
+                    :value="true"
+                >
+                    <v-icon
+                        slot="prepend"
+                        color="info"
+                    >
+                        material-icon-info_outline
+                    </v-icon>
+                    {{ i18n.step1.glbUnitInfo }}
+                </v-alert>
+                <div
+                    role="button"
+                    tabindex="0"
+                    class="drop-zone"
+                    :class="{ dragging: isDragging, 'has-file': !!draftUpload, 'drop-readonly': editMode }"
+                    :aria-label="i18n.step1.glbUnitInfo"
+                    @drop.prevent="onFileDrop"
+                    @dragover.prevent="onDragOver"
+                    @dragleave.prevent="isDragging = false"
+                    @click="!draftUpload && triggerFilePicker()"
+                    @keydown.enter.prevent="!draftUpload && triggerFilePicker()"
+                    @keydown.space.prevent="!draftUpload && triggerFilePicker()"
+                >
+                    <input
+                        ref="fileInput"
+                        type="file"
+                        accept=".glb"
+                        class="file-input"
+                        :aria-label="i18n.step1.glbUnitInfo"
+                        @change="onFilePick"
+                    >
+                    <template v-if="!draftUpload">
+                        <v-icon
+                            size="32"
+                            color="grey"
+                        >
+                            material-icon-cloud_upload
+                        </v-icon>
+                        <div class="drop-title">
+                            {{ i18n.step1.dropTitle }}
                         </div>
-                    </v-list-tile-avatar>
-                    <v-list-tile-content>
-                        <v-list-tile-title>{{ p.name }}</v-list-tile-title>
-                    </v-list-tile-content>
-                    <v-list-tile-action v-if="activePresetId === p.id">
-                        <v-icon color="primary">
+                        <div class="badges">
+                            <v-chip
+                                small
+                                outline
+                                class="badge"
+                            >
+                                <v-icon
+                                    left
+                                    x-small
+                                >
+                                    material-icon-3d_rotation
+                                </v-icon>
+                                {{ i18n.step1.formatBadge }}
+                            </v-chip>
+                            <v-chip
+                                small
+                                outline
+                                class="badge"
+                            >
+                                <v-icon
+                                    left
+                                    x-small
+                                >
+                                    material-icon-data_usage
+                                </v-icon>
+                                {{ maxSizeText }}
+                            </v-chip>
+                        </div>
+                    </template>
+                    <template v-else>
+                        <v-icon
+                            size="40"
+                            color="success"
+                        >
                             material-icon-check_circle
                         </v-icon>
-                    </v-list-tile-action>
-                </v-list-tile>
-            </v-list>
-        </div>
-
-        <div
-            v-else
-            class="custom-tab"
-        >
-            <v-alert
-                type="info"
-                outline
-                dense
-                class="unit-info"
-                :value="true"
-            >
-                <v-icon
-                    slot="prepend"
-                    color="info"
-                >
-                    material-icon-info_outline
-                </v-icon>
-                {{ i18n.step1.glbUnitInfo }}
-            </v-alert>
-            <div
-                role="button"
-                tabindex="0"
-                class="drop-zone"
-                :class="{ dragging: isDragging, 'has-file': !!draftUpload, 'drop-readonly': editMode }"
-                :aria-label="i18n.step1.glbUnitInfo"
-                @drop.prevent="onFileDrop"
-                @dragover.prevent="onDragOver"
-                @dragleave.prevent="isDragging = false"
-                @click="!draftUpload && triggerFilePicker()"
-                @keydown.enter.prevent="!draftUpload && triggerFilePicker()"
-                @keydown.space.prevent="!draftUpload && triggerFilePicker()"
-            >
-                <input
-                    ref="fileInput"
-                    type="file"
-                    accept=".glb"
-                    class="file-input"
-                    :aria-label="i18n.step1.glbUnitInfo"
-                    @change="onFilePick"
-                >
-                <template v-if="!draftUpload">
-                    <v-icon
-                        size="32"
-                        color="grey"
-                    >
-                        material-icon-cloud_upload
-                    </v-icon>
-                    <div class="drop-title">
-                        {{ i18n.step1.dropTitle }}
-                    </div>
-                    <div class="badges">
-                        <v-chip
-                            small
-                            outline
-                            class="badge"
-                        >
-                            <v-icon
-                                left
-                                x-small
-                            >
-                                material-icon-3d_rotation
-                            </v-icon>
-                            {{ i18n.step1.formatBadge }}
-                        </v-chip>
-                        <v-chip
-                            small
-                            outline
-                            class="badge"
-                        >
-                            <v-icon
-                                left
-                                x-small
-                            >
-                                material-icon-data_usage
-                            </v-icon>
-                            {{ maxSizeText }}
-                        </v-chip>
-                    </div>
-                </template>
-                <template v-else>
-                    <v-icon
-                        size="40"
-                        color="success"
-                    >
-                        material-icon-check_circle
-                    </v-icon>
-                    <div class="drop-title">
-                        {{ draftUpload.title }}
-                    </div>
-                    <v-btn
-                        v-if="!editMode"
-                        x-small
-                        outline
-                        color="error"
-                        class="mt-2"
-                        @click.stop="clearUpload"
-                    >
-                        <v-icon
-                            left
+                        <div class="drop-title">
+                            {{ draftUpload.title }}
+                        </div>
+                        <v-btn
+                            v-if="!editMode"
                             x-small
+                            outline
+                            color="error"
+                            class="mt-2"
+                            @click.stop="clearUpload"
                         >
-                            material-icon-close
-                        </v-icon>
-                        {{ i18n.step1.removeUpload }}
-                    </v-btn>
-                </template>
-            </div>
-            <div
-                v-if="fileError"
-                class="file-error"
-            >
-                <v-icon
-                    color="error"
-                    small
+                            <v-icon
+                                left
+                                x-small
+                            >
+                                material-icon-close
+                            </v-icon>
+                            {{ i18n.step1.removeUpload }}
+                        </v-btn>
+                    </template>
+                </div>
+                <v-alert
+                    type="error"
+                    outline
+                    dense
+                    class="file-error"
+                    :value="!!fileError"
                 >
-                    material-icon-error
-                </v-icon>
-                {{ fileError }}
+                    {{ fileError }}
+                </v-alert>
+                <div class="url-divider">
+                    <span>{{ i18n.step1.urlAlternative }}</span>
+                </div>
+                <v-text-field
+                    :value="draftUrl"
+                    :label="i18n.step1.urlLabel"
+                    :placeholder="i18n.step1.urlPlaceholder"
+                    :readonly="editMode"
+                    :disabled="editMode"
+                    hide-details
+                    dense
+                    outline
+                    prepend-inner-icon="material-icon-link"
+                    class="mb-3"
+                    @input="$emit('update:draftUrl', $event)"
+                />
             </div>
-            <div class="url-divider">
-                <span>{{ i18n.step1.urlAlternative }}</span>
-            </div>
+
             <v-text-field
-                :value="draftUrl"
-                :label="i18n.step1.urlLabel"
-                :placeholder="i18n.step1.urlPlaceholder"
-                :readonly="editMode"
-                :disabled="editMode"
+                :value="draftTitle"
+                :label="i18n.step1.titleLabel"
                 hide-details
                 dense
                 outline
-                prepend-inner-icon="material-icon-link"
-                class="mb-3"
-                @input="$emit('update:draftUrl', $event)"
+                prepend-inner-icon="material-icon-title"
+                class="title-field mt-3"
+                @input="$emit('update:draftTitle', $event)"
             />
         </div>
-
-        <v-text-field
-            :value="draftTitle"
-            :label="i18n.step1.titleLabel"
-            hide-details
-            dense
-            outline
-            prepend-inner-icon="material-icon-title"
-            class="title-field mt-3"
-            @input="$emit('update:draftTitle', $event)"
-        />
 
         <div class="button-bar">
             <v-spacer />

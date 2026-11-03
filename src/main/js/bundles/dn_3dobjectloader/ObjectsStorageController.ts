@@ -14,10 +14,12 @@
 /// limitations under the License.
 ///
 
+import { InjectedReference } from "apprt-core/InjectedReference";
 import { loggerForName } from "apprt-core/Logger";
 import IdbAdapter from "./IdbAdapter";
 
 const LOG = loggerForName("dn_3dobjectloader/ObjectsStorageController");
+const DEFAULT_DB_NAME = "dn_3dobjectloader";
 
 /**
  * Persistable description of a single placed 3D object.
@@ -82,11 +84,28 @@ export default class ObjectsStorageController {
         maxFileSize: number;
     };
 
+    /** Optional; used to derive a per-app default database name. */
+    _appCtx: InjectedReference<{ getApplicationName(): string }>;
+
     private _adapter: IdbAdapter | undefined;
 
-    /** Name of the IndexedDB database backing this storage. */
+    /**
+     * Name of the IndexedDB database backing this storage.
+     *
+     * Defaults to `dn_3dobjectloader_<appName>`: every save rewrites the whole
+     * items store, so apps sharing one database would overwrite each other's
+     * objects. Falls back to `dn_3dobjectloader` without an app context.
+     */
     get dbName(): string {
-        return this._properties?.dbName || "dn_3dobjectloader";
+        const configured = this._properties?.dbName;
+        if (configured) return configured;
+        let appName: string | undefined;
+        try {
+            appName = this._appCtx?.getApplicationName();
+        } catch (e) {
+            LOG.warn("could not read the app name", e);
+        }
+        return appName ? `${DEFAULT_DB_NAME}_${appName}` : DEFAULT_DB_NAME;
     }
 
     /**

@@ -31,8 +31,8 @@ export interface IdbAdapterOptions {
  * Thin promise wrapper around the native IndexedDB API.
  *
  * Manages a single database with two object stores:
- * - `items` (`keyPath: "id"`) — strukturiert gespeicherte {@link ObjectItem}s.
- * - `blobs` (out-of-line keys) — GLB-Blobs unter `customBlobKey`.
+ * - `items` (`keyPath: "id"`) — the stored {@link ObjectItem}s.
+ * - `blobs` (out-of-line keys) — uploaded GLB blobs under `customBlobKey`.
  *
  * Keeps the connection as a lazy singleton; `versionchange` closes the
  * connection when another tab raises the schema version, so the upgrade

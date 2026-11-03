@@ -95,6 +95,8 @@ export default class ObjectsController {
     private _sharedRestoreDone = false;
     /** True while {@link placeAt} is running; blocks a second placement by a fast double click. */
     private _placing = false;
+    /** Pending {@link _onToolActivated} run, awaited by {@link openTool}. */
+    private _toolActivation: Promise<void> = Promise.resolve();
     /** Holds a decoded URL state that arrived before {@link activate} completed. */
     private _pendingShared: { items: CompactItem[]; strategy: RestoreStrategy } | null = null;
 
@@ -221,7 +223,8 @@ export default class ObjectsController {
         this._toolWatchHandle = this._tool?.watch("active", (_n: string, _o: boolean, active: boolean) => {
             if (active) {
                 this._refreshMaskAvailability();
-                this._onToolActivated();
+                this._toolActivation = this._onToolActivated()
+                    .catch((e: unknown) => LOG.warn("tool activation failed", e));
             } else {
                 this._onToolDeactivated();
             }
@@ -230,7 +233,8 @@ export default class ObjectsController {
         // the watch above was attached; the watch would then never fire.
         if (this._tool?.active) {
             this._refreshMaskAvailability();
-            this._onToolActivated().catch((e: unknown) => LOG.warn("tool activation failed", e));
+            this._toolActivation = this._onToolActivated()
+                .catch((e: unknown) => LOG.warn("tool activation failed", e));
         }
         this._attachPopupActionListener().catch((e: unknown) => {
             LOG.warn("popup listener failed", e);
@@ -316,6 +320,76 @@ export default class ObjectsController {
         if (presetId) model.activePresetId = presetId;
         model.mode = "placing";
         this._setCursor(PLACEMENT_CURSOR);
+    }
+
+    /**
+     * Starts placing a preset from outside the widget (Integration API): opens
+     * the tool if needed, discards an unsaved draft, selects the preset on the
+     * presets tab and arms the next map click.
+     *
+     * @param presetId Preset to place; defaults to `model.activePresetId`.
+     * @returns `false` if the preset is unknown (nothing changes).
+     */
+    startPresetPlacement(presetId?: string): boolean {
+        const model = this._model;
+        if (!model || !this._selectPreset(presetId)) return false;
+        model.workflowStep = 2;
+        this.startPlacement();
+        this._activateTool();
+        return true;
+    }
+
+    /**
+     * Places a preset at the given point from outside the widget (Integration
+     * API). Opens the tool first, so the object can be edited right away.
+     *
+     * @param presetId Preset to place; defaults to `model.activePresetId`.
+     * @returns The placed item, or `undefined` if the preset is unknown.
+     */
+    async placePresetAt(point: Point, presetId?: string): Promise<ObjectItem | undefined> {
+        if (!this._selectPreset(presetId)) return undefined;
+        await this.openTool();
+        return this.placeAt(point);
+    }
+
+    /** Opens the tool and resolves once its activation (map listeners, step reset) has finished. */
+    async openTool(): Promise<void> {
+        this._activateTool();
+        await this._toolActivation;
+    }
+
+    private _activateTool(): void {
+        try {
+            if (this._tool && !this._tool.active) {
+                this._tool.set("active", true);
+            }
+        } catch (e) {
+            LOG.warn("activate tool failed", e);
+        }
+    }
+
+    /**
+     * Resets the widget to a clean start screen with the given preset selected
+     * on the presets tab (any unsaved draft is discarded).
+     *
+     * @returns `false` if the preset is unknown.
+     */
+    private _selectPreset(presetId?: string): boolean {
+        const model = this._model;
+        if (!model) return false;
+        const id = presetId ?? model.activePresetId;
+        if (!id || !this.getPresets().some(p => p.id === id)) {
+            LOG.warn("unknown preset {}", id);
+            return false;
+        }
+        if (model.mode === "placing") this.cancelPlacement();
+        if (model.currentItem) {
+            this._maskWorkflowController?.removeMaskGraphic(model.currentItem.id);
+        }
+        this.newObject();
+        model.activePresetId = id;
+        model.sourceTab = 0;
+        return true;
     }
 
     /** Leaves `placing` mode without creating an object and restores the cursor. */
@@ -804,6 +878,11 @@ export default class ObjectsController {
         } else if (model.workflowStep === 2) {
             if (model.mode === "placing") {
                 this.cancelPlacement();
+                // Placement on top of an existing item (Integration API):
+                // cancelPlacement() went back to "editing", so stay in step 2.
+                if (model.currentItem) return;
+                // Nothing placed yet: go straight back to step 1.
+                model.workflowStep = 1;
                 return;
             }
             if (model.currentItem && !this._isDraft()) {
@@ -942,7 +1021,8 @@ export default class ObjectsController {
      * Maps the decoded items to live objects and merges them into the scene
      * according to `strategy`. Runs at most once per session.
      *
-     * `replace` clears existing objects first; `append` keeps them; `ifEmpty`
+     * `replace` removes the existing preset objects first (uploads are kept,
+     * as a link cannot contain them); `append` keeps them; `ifEmpty`
      * only restores when nothing is placed locally. If none of the shared
      * presets are known to this app, the local state is left untouched — no
      * destructive replace without a replacement.
@@ -959,7 +1039,7 @@ export default class ObjectsController {
         if (!restored.length) return;
 
         if (strategy === "replace") {
-            await this._clearAllObjects();
+            await this._clearSharedObjects();
         }
         const existingIds = new Set(model.items.map((i: ObjectItem) => i.id));
         this._graphicsManager.resolveGroupLayer();
@@ -1022,29 +1102,31 @@ export default class ObjectsController {
         return items;
     }
 
-    /** Removes every placed object incl. graphics, masks and cached blobs, leaving the model empty. */
-    private async _clearAllObjects(): Promise<void> {
+    /**
+     * Removes the placed objects that a shared link can contain (presets) incl.
+     * their graphics and masks. Uploaded and URL-loaded objects are never part
+     * of a link, so they are kept; deleting them would lose them for good.
+     */
+    private async _clearSharedObjects(): Promise<void> {
         const model = this._model;
         if (!model) return;
+        this._discardDraftIfAny();
         this._sketchManager?.cancel();
         this._graphicsManager?.clearHighlight();
         this._restoreCursor();
-        const items = [...model.items];
-        for (const item of items) {
+        const shared = model.items.filter((i: ObjectItem) => i.source === "preset");
+        for (const item of shared) {
             this._graphicsManager?.removeGraphic(item.id);
             this._maskWorkflowController?.removeMaskGraphic(item.id);
             await this._meshMaskManager?.remove(item.id);
-            if (item.customBlobKey) {
-                if (item.meshUrl?.startsWith("blob:")) {
-                    try { URL.revokeObjectURL(item.meshUrl); } catch { /* noop */ }
-                }
-                await this._storage?.deleteBlob(item.customBlobKey);
-            }
         }
         model.currentItem = undefined;
-        model.lastSavedId = undefined;
+        if (shared.some((i: ObjectItem) => i.id === model.lastSavedId)) {
+            model.lastSavedId = undefined;
+        }
         model.mode = "idle";
-        model.items.splice(0, model.items.length);
+        const kept = model.items.filter((i: ObjectItem) => i.source !== "preset");
+        model.items.splice(0, model.items.length, ...kept);
     }
 
     /** Hook for tool activation: wires click/popup listeners and resets the workflow if no draft is in flight. */
@@ -1054,7 +1136,9 @@ export default class ObjectsController {
         const model = this._model;
         if (!model) return;
         const step = model.workflowStep;
-        const preserveStep = step === "final" || step === "list";
+        // Also keep the step while placing: the Integration API starts a
+        // placement and then opens the tool.
+        const preserveStep = step === "final" || step === "list" || model.mode === "placing";
         if (!preserveStep && (!model.items.length || !model.currentItem)) {
             model.workflowStep = 1;
             model.listView = false;
@@ -1172,13 +1256,7 @@ export default class ObjectsController {
         // {@link nextStep}).
         model.mode = "idle";
 
-        try {
-            if (this._tool && !this._tool.active) {
-                this._tool.set("active", true);
-            }
-        } catch (e) {
-            LOG.warn("activate tool failed", e);
-        }
+        this._activateTool();
     }
 
     /** Resolves an item by id; also returns the current draft if its id matches. */

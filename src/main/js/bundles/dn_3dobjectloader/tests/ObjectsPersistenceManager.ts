@@ -59,11 +59,16 @@ describe("dn_3dobjectloader/tests/ObjectsPersistenceManager", function () {
             assert.equal(items[0].meshUrl, "https://example.org/cube.glb");
         });
 
-        it("drops items whose preset no longer exists", async function () {
+        it("hides items whose preset is unknown but keeps them in storage", async function () {
             const storage = createStorage([storedItem({}), storedItem({ id: "id2", presetId: "removed" })]);
-            const { items, droppedCount } = await createManager(storage).manager.loadAndHydrate();
-            assert.lengthOf(items, 1);
-            assert.equal(droppedCount, 1);
+            const { model, manager } = createManager(storage);
+            const { items, droppedCount } = await manager.loadAndHydrate();
+            assert.deepEqual(items.map(i => i.id), ["id1"]);
+            assert.equal(droppedCount, 0);
+
+            model.items = items;
+            await manager.persistNow();
+            assert.deepEqual(storage.saved[0].map(i => i.id), ["id1", "id2"]);
         });
 
         it("restores uploaded files from the blob store", async function () {

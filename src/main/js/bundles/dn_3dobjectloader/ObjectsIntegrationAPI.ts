@@ -36,13 +36,15 @@ export default class ObjectsIntegrationAPI {
     }
 
     /**
-     * Places the currently active preset (or custom draft) at the given map point
-     * and returns the newly created item.
+     * Places a preset at the given map point and returns the newly created item.
+     * Opens the tool if it is closed, so the object can be edited right away.
      *
      * @param point Target location in the view's spatial reference.
+     * @param presetId Preset to place; defaults to the preset last selected.
+     * @returns `undefined` if the preset is unknown.
      */
-    async placeAt(point: Point): Promise<ObjectItem | undefined> {
-        return this._controller?.placeAt(point);
+    async placeAt(point: Point, presetId?: string): Promise<ObjectItem | undefined> {
+        return this._controller?.placePresetAt(point, presetId);
     }
 
     /**
@@ -58,12 +60,13 @@ export default class ObjectsIntegrationAPI {
     }
 
     /**
-     * Arms the controller for a single placement on the next map click.
+     * Opens the tool (if it is closed) and arms a single placement of a preset
+     * on the next map click.
      *
-     * @param presetId Optional preset to activate; falls back to the model's
-     *                 currently active preset.
+     * @param presetId Preset to place; defaults to the preset last selected.
+     * @returns `false` if the preset is unknown.
      */
-    startPlacement(presetId?: string): void {
-        this._controller?.startPlacement(presetId);
+    startPlacement(presetId?: string): boolean {
+        return this._controller?.startPresetPlacement(presetId) ?? false;
     }
 }

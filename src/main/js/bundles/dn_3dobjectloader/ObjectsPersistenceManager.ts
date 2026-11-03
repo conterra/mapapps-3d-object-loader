@@ -34,6 +34,12 @@ const PERSIST_DEBOUNCE_MS = 250;
 export default class ObjectsPersistenceManager {
     private _persistTimeout: ReturnType<typeof setTimeout> | null = null;
     private _disposed = false;
+    /**
+     * Stored preset items whose preset is not configured (any more). They are
+     * not shown but are written back on every save, so a config mistake
+     * (renamed preset id, `includeDefaultPresets` toggled) does not delete them.
+     */
+    private _unresolved: ObjectItem[] = [];
 
     constructor(
         private readonly _storage: ObjectsStorageController,
@@ -60,7 +66,7 @@ export default class ObjectsPersistenceManager {
         }
         if (!this._storage) return;
         try {
-            await this._storage.save([...this._model.items]);
+            await this._storage.save([...this._model.items, ...this._unresolved]);
         } catch (e) {
             LOG.error("persist failed", e);
         }
@@ -87,14 +93,16 @@ export default class ObjectsPersistenceManager {
      * Loads persisted items and resolves their mesh URLs.
      *
      * Preset items get their URL from the current preset list; custom
-     * items are rehydrated from the blob cache. Items whose URL cannot be
-     * resolved are dropped.
+     * items are rehydrated from the blob cache. Preset items with an unknown
+     * preset are kept aside (not returned, but still saved); custom items
+     * whose blob is missing are dropped.
      *
      * @returns The restored items plus the number of dropped entries; the
      *          caller is expected to call {@link persist} again if any item
      *          was dropped so the storage matches in-memory state.
      */
     async loadAndHydrate(): Promise<{ items: ObjectItem[]; droppedCount: number }> {
+        this._unresolved = [];
         if (!this._storage) return { items: [], droppedCount: 0 };
         const stored = await this._storage.load();
         if (!stored.length) return { items: [], droppedCount: 0 };
@@ -112,7 +120,12 @@ export default class ObjectsPersistenceManager {
         }));
 
         const restored = stored.filter(item => !!item.meshUrl);
-        const droppedCount = stored.length - restored.length;
+        this._unresolved = stored.filter(item => !item.meshUrl && item.source === "preset");
+        if (this._unresolved.length > 0) {
+            LOG.warn("kept {} object(s) with an unknown preset; they are shown again once the preset is configured",
+                this._unresolved.length);
+        }
+        const droppedCount = stored.length - restored.length - this._unresolved.length;
         if (droppedCount > 0) {
             LOG.warn("dropped {} item(s) with missing mesh resource", droppedCount);
         }

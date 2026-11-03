@@ -140,10 +140,17 @@
             "name": "ObjectsStorageController",
             "provides": "dn_3dobjectloader.ObjectsStorageController",
             "properties": {
-                "dbName": "dn_3dobjectloader",
+                "dbName": "",
                 "schemaVersion": 1,
                 "maxFileSize": 10485760
-            }
+            },
+            "references": [
+                {
+                    "name": "_appCtx",
+                    "providing": "ct.framework.api.ApplicationContext",
+                    "cardinality": "0..1"
+                }
+            ]
         },
         {
             "name": "ObjectsMeshMaskManager",
@@ -377,7 +384,7 @@
                 "id": "objectLoaderToggleTool",
                 "title": "${tool.title}",
                 "tooltip": "${tool.tooltip}",
-                "iconClass": "icon-dn-3dobjectloader",
+                "iconClass": "icon-box-closed",
                 "toolRole": "toolset",
                 "togglable": true,
                 "rules": {

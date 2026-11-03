@@ -19,3 +19,4 @@ import "./spatialReferenceUtils";
 import "./ObjectsPersistenceManager";
 import "./ObjectsParameterResolver";
 import "./PresetModel";
+import "./ObjectsStorageController";

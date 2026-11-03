@@ -73,14 +73,14 @@ Properties of a preset model:
 
 | Property      | Type   | Possible Values | Default                   | Description                                                                                              |
 | ------------- | ------ | --------------- | ------------------------- | -------------------------------------------------------------------------------------------------------- |
-| dbName        | String |                 | ```"dn_3dobjectloader"``` | Name of the IndexedDB database. Use different names for apps on the same host that must not share objects. |
+| dbName        | String |                 | ```"dn_3dobjectloader_<app name>"``` | Name of the IndexedDB database. The default is unique per app. Apps that set the same name share and overwrite each other's objects, because every save rewrites the whole list. Renaming the app or changing this name starts with an empty list. |
 | maxFileSize   | Number |                 | ```10485760``` (10 MB)    | Maximum size of an uploaded `.glb` file in bytes.                                                          |
 
 #### ObjectsParameterResolver
 
 | Property        | Type   | Possible Values                                         | Default         | Description                                                                                                                     |
 | --------------- | ------ | ------------------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| restoreStrategy | String | ```replace``` &#124; ```append``` &#124; ```ifEmpty``` | ```"replace"``` | How objects from the URL parameter `obj3d` are combined with the objects stored in the browser: replace, add, or only restore if none are stored. |
+| restoreStrategy | String | ```replace``` &#124; ```append``` &#124; ```ifEmpty``` | ```"replace"``` | How objects from the URL parameter `obj3d` are combined with the objects stored in the browser: `replace` replaces the prefabricated and configured objects (uploaded files are kept, because a URL cannot contain them), `append` adds them, `ifEmpty` only restores them if no objects are stored. |
 
 ### Prefabricated objects
 
@@ -115,10 +115,14 @@ the presets in a project-specific copyright widget:
 | Method                     | Description                                                             |
 | -------------------------- | ----------------------------------------------------------------------- |
 | `getPresets()`             | Returns the prefabricated objects and the configured preset models.     |
-| `startPlacement(presetId)` | Starts the placement of a preset; the next click on the map places it.  |
-| `placeAt(point)`           | Places the active preset at the given point.                            |
+| `startPlacement(presetId)` | Starts the placement of a preset; the next click on the map places it. Returns `false` for an unknown preset. |
+| `placeAt(point, presetId)` | Places a preset at the given point and returns the placed object.       |
 | `selectObject(id)`         | Selects a placed object.                                                |
 | `removeObject(id)`         | Removes a placed object including its planning area.                    |
+
+`startPlacement` and `placeAt` open the tool if it is closed, so the user can position the object right away. They
+always place a preset (switching the widget to the prefabricated objects); without `presetId`, the preset last
+selected is used.
 
 ## Restrictions
 
@@ -127,3 +131,5 @@ the presets in a project-specific copyright widget:
   0 and has to be entered by the user.
 - Objects are stored per browser. Only prefabricated and configured objects can be shared via URL, not uploaded
   files.
+- Stored objects whose preset is no longer configured (e.g. after renaming a preset `id`) are hidden, but kept in
+  the browser. They are shown again once the preset is configured again.
