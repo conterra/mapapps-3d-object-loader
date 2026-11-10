@@ -1,6 +1,6 @@
 {
-    "name": "mapapps-devnet-blueprint",
-    "description": "test build",
+    "name": "mapapps-3d-object-loader",
+    "description": "map.apps bundle for placing 3D models in a 3D scene",
     "version": "0.0.1",
     "license": "Apache-2.0",
     "scripts": {
