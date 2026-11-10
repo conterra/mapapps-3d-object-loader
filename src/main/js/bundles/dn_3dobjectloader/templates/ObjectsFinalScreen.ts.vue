@@ -24,7 +24,7 @@
             :value="true"
         >
             <div class="final-banner-inner">
-                <span class="final-banner-text">{{ i18n.final.success }}</span>
+                <span class="final-banner-text text--text">{{ i18n.final.success }}</span>
             </div>
         </v-alert>
         <div class="final-content">

@@ -16,6 +16,7 @@
 
 import { InjectedReference } from "apprt-core/InjectedReference";
 import { loggerForName } from "apprt-core/Logger";
+import type { ApplicationContext } from "apprt/api";
 import IdbAdapter from "./IdbAdapter";
 
 const LOG = loggerForName("dn_3dobjectloader/ObjectsStorageController");
@@ -85,7 +86,7 @@ export default class ObjectsStorageController {
     };
 
     /** Optional; used to derive a per-app default database name. */
-    _appCtx: InjectedReference<{ getApplicationName(): string }>;
+    _appCtx: InjectedReference<ApplicationContext>;
 
     private _adapter: IdbAdapter | undefined;
 

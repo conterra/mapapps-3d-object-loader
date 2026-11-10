@@ -52,6 +52,8 @@ export default {
         removeUpload: "Datei entfernen",
         formatBadge: ".glb Format",
         maxSizeBadge: "Max. {maxSize} MB",
+        invalidFileType: "Es werden nur .glb-Dateien unterstützt.",
+        fileTooLarge: "Die Datei ist größer als {maxSize} MB.",
         urlAlternative: "Alternativ die URL angeben",
         urlLabel: "URL zur .glb Datei",
         urlPlaceholder: "https://",

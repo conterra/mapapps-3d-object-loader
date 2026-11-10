@@ -31,7 +31,7 @@
                 >
                     material-icon-info_outline
                 </v-icon>
-                {{ i18n.step3.instruction }}
+                <span class="text--text">{{ i18n.step3.instruction }}</span>
             </v-alert>
             <section
                 v-if="hasMask"

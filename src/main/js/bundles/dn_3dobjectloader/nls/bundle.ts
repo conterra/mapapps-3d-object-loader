@@ -51,6 +51,8 @@ const i18n = {
             removeUpload: "Remove file",
             formatBadge: ".glb format",
             maxSizeBadge: "Max. {maxSize} MB",
+            invalidFileType: "Only .glb files are supported.",
+            fileTooLarge: "The file is larger than {maxSize} MB.",
             urlAlternative: "Alternatively specify the URL",
             urlLabel: "URL to the .glb file",
             urlPlaceholder: "https://",

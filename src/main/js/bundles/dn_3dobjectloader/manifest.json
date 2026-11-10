@@ -384,7 +384,7 @@
                 "id": "objectLoaderToggleTool",
                 "title": "${tool.title}",
                 "tooltip": "${tool.tooltip}",
-                "iconClass": "icon-box-closed",
+                "iconClass": "material-icon-view_in_ar",
                 "toolRole": "toolset",
                 "togglable": true,
                 "rules": {

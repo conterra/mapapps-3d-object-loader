@@ -878,7 +878,7 @@ export default class ObjectsController {
         } else if (model.workflowStep === 2) {
             if (model.mode === "placing") {
                 this.cancelPlacement();
-                // Placement on top of an existing item (Integration API):
+                // Placement with an existing current item:
                 // cancelPlacement() went back to "editing", so stay in step 2.
                 if (model.currentItem) return;
                 // Nothing placed yet: go straight back to step 1.

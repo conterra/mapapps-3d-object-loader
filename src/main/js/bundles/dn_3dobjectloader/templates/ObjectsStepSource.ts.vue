@@ -98,7 +98,7 @@
                     >
                         material-icon-info_outline
                     </v-icon>
-                    {{ i18n.step1.glbUnitInfo }}
+                    <span class="text--text">{{ i18n.step1.glbUnitInfo }}</span>
                 </v-alert>
                 <div
                     role="button"
@@ -195,7 +195,7 @@
                     class="file-error"
                     :value="!!fileError"
                 >
-                    {{ fileError }}
+                    <span class="text--text">{{ fileError }}</span>
                 </v-alert>
                 <div class="url-divider">
                     <span>{{ i18n.step1.urlAlternative }}</span>
@@ -272,10 +272,13 @@
             };
         },
         computed: {
-            /** Upload size hint, e.g. "Max. 10 MB", from the configured `maxFileSize`. */
+            /** Configured `maxFileSize` in MB, rounded to one decimal. */
+            maxSizeMb(): string {
+                return String(Math.round((this.maxFileSize / 1048576) * 10) / 10);
+            },
+            /** Upload size hint, e.g. "Max. 10 MB". */
             maxSizeText(): string {
-                const mb = Math.round((this.maxFileSize / 1048576) * 10) / 10;
-                return String(this.i18n.step1.maxSizeBadge).replace("{maxSize}", String(mb));
+                return String(this.i18n.step1.maxSizeBadge).replace("{maxSize}", this.maxSizeMb);
             },
             canProceed(): boolean {
                 // In edit mode the source is locked, so the "next" button must
@@ -322,11 +325,11 @@
             },
             handleFile(file: File) {
                 if (!file.name.toLowerCase().endsWith(".glb")) {
-                    this.fileError = ".glb";
+                    this.fileError = String(this.i18n.step1.invalidFileType);
                     return;
                 }
                 if (file.size > this.maxFileSize) {
-                    this.fileError = this.maxSizeText;
+                    this.fileError = String(this.i18n.step1.fileTooLarge).replace("{maxSize}", this.maxSizeMb);
                     return;
                 }
                 this.fileError = "";

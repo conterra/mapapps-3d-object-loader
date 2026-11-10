@@ -42,17 +42,6 @@
     font-size: 12.5px;
 }
 
-/* Readable alert text. The map.apps themes set `.info--text` to a light gray
-   (e.g. `silver`) and `.warning--text` to orange with `!important`, which is
-   about 2:1 contrast on a light background (WCAG AA needs 4.5:1). Vuetify puts
-   these classes on outline alerts, so the text would inherit them. Only the
-   text gets the standard dark text color; icon and border keep the theme
-   color that signals the alert type. */
-.vue-base .dn-3dobjectloader .v-alert > div,
-.vue-base .dn-3dobjectloader .v-alert > div * {
-    color: rgba(0, 0, 0, 0.87) !important;
-}
-
 /* Stepper */
 .vue-base .dn-3dobjectloader .stepper {
     display: flex;

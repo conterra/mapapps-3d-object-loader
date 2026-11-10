@@ -35,7 +35,7 @@
                     >
                         material-icon-my_location
                     </v-icon>
-                    <div class="placing-alert-body">
+                    <div class="placing-alert-body text--text">
                         <strong>{{ i18n.ui.clickMapInstruction }}</strong>
                         <v-btn
                             x-small
@@ -210,7 +210,7 @@
                         >
                             material-icon-warning
                         </v-icon>
-                        {{ i18n.step2.distortionWarning }}
+                        <span class="text--text">{{ i18n.step2.distortionWarning }}</span>
                     </v-alert>
                 </section>
 
