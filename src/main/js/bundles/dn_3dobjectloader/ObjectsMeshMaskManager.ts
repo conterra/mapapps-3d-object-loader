@@ -22,6 +22,9 @@ import { fromJSON } from "@arcgis/core/geometry/support/jsonUtils";
 import { InjectedReference } from "apprt-core/InjectedReference";
 import { loggerForName } from "apprt-core/Logger";
 import { MapWidgetModel } from "map-widget/api";
+import SpatialReference from "@arcgis/core/geometry/SpatialReference";
+import { hasOutOfRangeGeographicCoordinates } from "./spatialReferenceUtils";
+import { waitForView } from "./waitForView";
 
 const LOG = loggerForName("dn_3dobjectloader/ObjectsMeshMaskManager");
 
@@ -100,6 +103,28 @@ export default class ObjectsMeshMaskManager {
             // waiting for the mesh layer — their resolution will write the
             // authoritative state.
             return;
+        }
+
+        if (hasOutOfRangeGeographicCoordinates(geomWithZ.spatialReference, geomWithZ.rings)) {
+            // Older versions restored shared links before the map's spatial
+            // reference was known, so masks were stored as WGS84 although
+            // their coordinates are map units. Applying such a geometry makes
+            // the I3S worker fail on every tile and the whole mesh vanishes.
+            // The coordinates themselves are right: re-label them with the
+            // map's spatial reference, or skip the mask if that is impossible.
+            const mapSr = await this._getMapSpatialReference();
+            if (this._modifications.get(objectId) !== modification) return;
+            if (!mapSr || mapSr.isGeographic) {
+                this._modifications.delete(objectId);
+                LOG.warn("mask of object '{}' skipped: coordinates are outside the range of its geographic spatial reference", objectId);
+                return;
+            }
+            modification.geometry = new Polygon({
+                rings: geomWithZ.rings,
+                hasZ: true,
+                spatialReference: mapSr
+            });
+            LOG.warn("mask of object '{}' had a wrong spatial reference; using EPSG:{}", objectId, mapSr.wkid);
         }
 
         this._removeModificationsForObject(mesh, objectId);
@@ -201,6 +226,13 @@ export default class ObjectsMeshMaskManager {
     /** Exposes the configured mesh layer id for consumers that need to react to it. */
     getMeshLayerId(): string {
         return this.meshLayerId;
+    }
+
+    /** Resolves the spatial reference of the map once the view is ready. */
+    private async _getMapSpatialReference(): Promise<SpatialReference | undefined> {
+        const view = await waitForView(this._mapWidgetModel);
+        await view?.when().catch(() => undefined);
+        return view?.spatialReference ?? this._mapWidgetModel?.spatialReference ?? undefined;
     }
 
     private _isMeshLayer(layer: any): layer is IntegratedMeshLayer {

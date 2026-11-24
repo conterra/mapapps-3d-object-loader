@@ -1035,6 +1035,13 @@ export default class ObjectsController {
         if (!model) return;
         if (strategy === "ifEmpty" && model.items.length > 0) return;
 
+        // The compact items carry bare map coordinates. Wait until the view
+        // (and thus the map's spatial reference) is ready, otherwise the mask
+        // polygons would fall back to WGS84 while holding projected values,
+        // which makes the I3S worker fail on every mesh tile.
+        const view = await waitForView(this._mapWidgetModel);
+        await view?.when().catch(() => undefined);
+
         const restored = this._compactToItems(compact);
         if (!restored.length) return;
 
@@ -1090,7 +1097,9 @@ export default class ObjectsController {
                 maskHeight: mh ?? c.z,
                 createdAt: Date.now()
             };
-            if (mask?.r?.length && mh !== undefined) {
+            // Without a known spatial reference the polygon would default to
+            // WGS84; skip the mask rather than corrupt the mesh.
+            if (mask?.r?.length && mh !== undefined && spatialReference) {
                 item.maskGeometryJson = {
                     rings: mask.r.map(ring => ring.map(([x, y]) => [x, y, mh])),
                     hasZ: true,
