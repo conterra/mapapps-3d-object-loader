@@ -80,3 +80,23 @@ export function metersToMapOffset(
 export function coordinateDecimals(sr: SpatialReferenceLike | undefined): number {
     return sr?.isGeographic ? 7 : 2;
 }
+
+/**
+ * Detects ring coordinates that cannot be geographic: a `longitude` outside
+ * ±180° or a `latitude` outside ±90°.
+ *
+ * A polygon whose JSON lacks a spatial reference is read as WGS84 by
+ * `fromJSON`, so projected map coordinates (e.g. UTM meters) end up
+ * mislabelled. Such a geometry makes the I3S worker fail on every mesh tile
+ * when used as a `SceneModification`; this check identifies it.
+ *
+ * @returns `true` if the spatial reference is geographic and at least one
+ *          vertex lies outside the valid degree range.
+ */
+export function hasOutOfRangeGeographicCoordinates(
+    sr: SpatialReferenceLike | undefined,
+    rings: number[][][] | undefined
+): boolean {
+    if (!sr?.isGeographic || !rings) return false;
+    return rings.some(ring => ring.some(([x, y]) => Math.abs(x) > 180 || Math.abs(y) > 90));
+}

@@ -15,7 +15,7 @@
 ///
 
 import { assert } from "chai";
-import { coordinateDecimals, metersToMapOffset } from "../spatialReferenceUtils";
+import { coordinateDecimals, hasOutOfRangeGeographicCoordinates, metersToMapOffset } from "../spatialReferenceUtils";
 
 const UTM = { isGeographic: false, isWebMercator: false, metersPerUnit: 1 };
 const FEET = { isGeographic: false, isWebMercator: false, metersPerUnit: 0.3048 };
@@ -68,6 +68,28 @@ describe("dn_3dobjectloader/tests/spatialReferenceUtils", function () {
             assert.equal(coordinateDecimals(UTM), 2);
             assert.equal(coordinateDecimals(WEB_MERCATOR), 2);
             assert.equal(coordinateDecimals(undefined), 2);
+        });
+    });
+
+    describe("hasOutOfRangeGeographicCoordinates", function () {
+        // Mask ring from a shared link, UTM 32N meters (EPSG:25832).
+        const utmRing = [[
+            [344637.28, 5676174.75], [344613.48, 5676174.75], [344613.48, 5676149.68], [344637.28, 5676174.75]
+        ]];
+
+        it("flags projected coordinates labelled as geographic", function () {
+            assert.isTrue(hasOutOfRangeGeographicCoordinates(WGS84, utmRing));
+        });
+
+        it("accepts valid degrees", function () {
+            const ring = [[[7.1, 51.2], [-180, -90], [180, 90], [7.1, 51.2]]];
+            assert.isFalse(hasOutOfRangeGeographicCoordinates(WGS84, ring));
+        });
+
+        it("ignores projected spatial references and missing input", function () {
+            assert.isFalse(hasOutOfRangeGeographicCoordinates(UTM, utmRing));
+            assert.isFalse(hasOutOfRangeGeographicCoordinates(undefined, utmRing));
+            assert.isFalse(hasOutOfRangeGeographicCoordinates(WGS84, undefined));
         });
     });
 });
