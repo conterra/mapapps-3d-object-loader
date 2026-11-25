@@ -51,7 +51,7 @@
                     "h": 725
                 },
                 "marginBox": {
-                    "w": 555,
+                    "w": 650,
                     "t": 160,
                     "l": 80,
                     "b": 40
@@ -69,11 +69,21 @@
                 "title": "${ui.windowTitle}",
                 "dockTool": "objectLoaderToggleTool",
                 "minimizeOnClose": true,
+                "fixEdgesInViewPort": {
+                    "l": true,
+                    "r": false,
+                    "t": true,
+                    "b": true
+                },
+                "maxSize": {
+                    "w": 9999,
+                    "h": 725
+                },
                 "marginBox": {
                     "w": 460,
-                    "h": 600,
                     "t": 90,
-                    "l": 20
+                    "l": 20,
+                    "b": 40
                 }
             }
         },
@@ -87,7 +97,6 @@
                 "title": "${ui.windowTitle}",
                 "dockTool": "objectLoaderToggleTool",
                 "dockingBar": "${id}-dockingBarBottomLeft",
-                "windowClass": "dn-3dobjectloader-sheet",
                 "minimizeOnClose": true,
                 "resizable": false,
                 "draggable": false,
@@ -99,7 +108,8 @@
                 "marginBox": {
                     "l": 0,
                     "r": 0,
-                    "b": 0
+                    "b": 41,
+                    "h": "60%"
                 }
             }
         },
@@ -113,7 +123,6 @@
                 "title": "${ui.windowTitle}",
                 "dockTool": "objectLoaderToggleTool",
                 "dockingBar": "${id}-dockingBarLeft",
-                "windowClass": "dn-3dobjectloader-sheet",
                 "minimizeOnClose": true,
                 "resizable": false,
                 "draggable": false,
@@ -126,7 +135,7 @@
                     "l": 0,
                     "t": 0,
                     "b": 0,
-                    "w": 480
+                    "w": "50%"
                 }
             }
         }

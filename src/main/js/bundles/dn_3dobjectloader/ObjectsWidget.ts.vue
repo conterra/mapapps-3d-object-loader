@@ -21,6 +21,7 @@
             v-if="listView"
             :i18n="i18n"
             :items="items"
+            :presets="presets"
             :selected-id="selectedId"
             @new="$emit('new')"
             @select="$emit('select', $event)"
@@ -41,17 +42,12 @@
         <template v-else>
             <v-alert
                 type="info"
+                color="primary"
                 outline
                 dense
                 class="step-info"
                 :value="true"
             >
-                <v-icon
-                    slot="prepend"
-                    color="info"
-                >
-                    material-icon-info_outline
-                </v-icon>
                 <span>{{ stepInfoText }}</span>
             </v-alert>
 
@@ -60,7 +56,7 @@
                     <div
                         :key="'step-'+n"
                         class="step"
-                        :class="{ active: String(workflowStep) === n, done: isStepDone(n) }"
+                        :class="{ active: String(workflowStep) === n }"
                     >
                         <span
                             class="num"

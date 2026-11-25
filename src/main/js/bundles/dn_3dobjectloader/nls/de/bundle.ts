@@ -90,7 +90,7 @@ export default {
         success: "Das 3D-Objekt wurde erfolgreich gespeichert!",
         next: "Was möchten Sie als nächstes tun?",
         newObject: "neues Objekt erstellen",
-        close: "beenden",
+        close: "Schließen",
         editLast: "erneut bearbeiten",
         showList: "alle 3D-Objekte anzeigen"
     },

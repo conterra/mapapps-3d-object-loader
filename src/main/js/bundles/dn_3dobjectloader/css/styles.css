@@ -23,12 +23,13 @@
     height: 100%;
     padding: 12px 16px 8px 16px;
     box-sizing: border-box;
-    font-size: 13px;
     overflow: hidden;
+    /* Themes set the window text to a light weight (e.g. 100), Vuetify components use 400.
+       Without this, plain texts (hints, step labels) look thinner than the lists and tabs. */
+    font-weight: 400;
 }
 
-.vue-base .dn-3dobjectloader .step-info,
-.vue-base .dn-3dobjectloader .unit-info {
+.vue-base .dn-3dobjectloader .step-info {
     margin-bottom: 12px;
 }
 
@@ -36,10 +37,22 @@
     margin-bottom: 6px;
 }
 
-/* Vuetify 1.5 renders the alert text as a plain `div` next to `.v-alert__icon`. */
-.vue-base .dn-3dobjectloader .step-info > div,
-.vue-base .dn-3dobjectloader .unit-info > div {
-    font-size: 12.5px;
+/* Info boxes: outline alerts in the theme's primary colour (border, icon and text) with a
+   light tint of the same colour as background. The tint is drawn behind the content with
+   `currentcolor`, so it follows the theme instead of a fixed colour. */
+.vue-base .dn-3dobjectloader .v-alert.v-alert--outline.primary--text {
+    position: relative;
+    z-index: 0;
+}
+
+.vue-base .dn-3dobjectloader .v-alert.v-alert--outline.primary--text::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-color: currentcolor;
+    opacity: 0.08;
+    pointer-events: none;
 }
 
 /* Stepper */
@@ -48,23 +61,19 @@
     align-items: center;
     gap: 6px;
     padding: 8px 0 12px 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-    margin-bottom: 10px;
 }
 
 .vue-base .dn-3dobjectloader .stepper .step {
     display: flex;
     align-items: center;
     gap: 6px;
-    color: rgba(0, 0, 0, 0.45);
-    font-size: 12px;
     white-space: nowrap;
 }
 
 .vue-base .dn-3dobjectloader .stepper .step-sep {
     flex: 1;
-    height: 1px;
-    background-color: rgba(0, 0, 0, 0.15);
+    border-top: 1px solid currentcolor;
+    opacity: 0.25;
     min-width: 12px;
 }
 
@@ -75,21 +84,21 @@
     width: 22px;
     height: 22px;
     border-radius: 50%;
-    background-color: rgba(0, 0, 0, 0.25);
-    color: #fff;
-    font-weight: 600;
-    font-size: 12px;
+    /* Upcoming steps: outlined in the text colour, so it works with light and dark themes.
+       Active and done steps get Vuetify's `primary` class (filled with the theme colour). */
+    border: 1px solid currentcolor;
+    box-sizing: border-box;
+    font-weight: 700;
+    font-size: 0.8em;
     flex-shrink: 0;
 }
 
-.vue-base .dn-3dobjectloader .stepper .step.done .num {
-    opacity: 0.7;
+.vue-base .dn-3dobjectloader .stepper .step .num.primary {
+    color: #fff;
 }
 
-.vue-base .dn-3dobjectloader .stepper .step.active,
-.vue-base .dn-3dobjectloader .stepper .step.done {
-    color: rgba(0, 0, 0, 0.85);
-    font-weight: 500;
+.vue-base .dn-3dobjectloader .stepper .step.active {
+    font-weight: 700;
 }
 
 /* Content area: each step is a column of a scrolling body and a fixed button
@@ -113,8 +122,8 @@
 }
 
 .vue-base .dn-3dobjectloader .step-content .section-heading {
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 0.875em;
+    font-weight: 700;
     margin: 6px 0 8px 0;
     display: flex;
     align-items: center;
@@ -128,13 +137,12 @@
     align-items: center;
     gap: 4px;
     padding: 10px 0 4px 0;
-    border-top: 1px solid rgba(0, 0, 0, 0.08);
     margin-top: auto;
 }
 
 /* Tablet sublayouts only: footer buttons may grow in height and wrap their
-   label, so long (e.g. German) labels do not overflow the button. Desktop and
-   mobile are intentionally unchanged.
+   label, so long (e.g. German) labels do not overflow the button. Desktop is
+   unchanged; mobile stacks the final screen buttons (see below).
    Cause of the clipping: Vuetify's .v-btn__content is a flex row with
    `flex: 1 0 auto` (no shrinking) and `white-space: nowrap`. The button shrinks
    inside the bar, the content does not, so its text overflows. white-space or
@@ -145,8 +153,7 @@
    wrap. `anywhere` (unlike `break-word`) lowers the min-content width of the
    anonymous text item so it can shrink inside the flex container.
    Specificity (0,6,0) wins over theme rules (0,3,0). */
-[class*="ctLayout_tablet_"] .vue-base .dn-3dobjectloader .button-bar .v-btn,
-[class*="ctLayout_tablet_"] .vue-base .dn-3dobjectloader .final-footer .v-btn {
+[class*="ctLayout_tablet_"] .vue-base .dn-3dobjectloader .button-bar .v-btn {
     height: auto;
     min-height: 36px;
     /* min-width as a floor: all buttons in the bar shrink proportionally, and
@@ -159,12 +166,20 @@
     padding: 2px 8px;
 }
 
-[class*="ctLayout_tablet_"] .vue-base .dn-3dobjectloader .button-bar .v-btn .v-btn__content,
-[class*="ctLayout_tablet_"] .vue-base .dn-3dobjectloader .final-footer .v-btn .v-btn__content {
+[class*="ctLayout_tablet_"] .vue-base .dn-3dobjectloader .button-bar .v-btn .v-btn__content {
     flex: 1 1 auto;
     min-width: 0;
     white-space: normal;
     overflow-wrap: anywhere;
+}
+
+/* Fields in the step column keep their own height (Vuetify's .v-input has flex: 1 1 auto).
+   The padding makes room for the field underline, which Vuetify draws 1px below the
+   field; otherwise it overflows the step body and adds a second scrollbar next to the
+   preset list. */
+.vue-base .dn-3dobjectloader .step-body > .v-input {
+    flex: 0 0 auto;
+    padding-bottom: 1px;
 }
 
 /* Step 1: preset list */
@@ -183,20 +198,13 @@
     flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 4px;
 }
 
-.vue-base .dn-3dobjectloader .preset-list .v-list__tile {
-    height: 44px;
-}
-
-.vue-base .dn-3dobjectloader .preset-list .preset-selected {
-    background-color: rgba(0, 0, 0, 0.06);
-}
-
-.vue-base .dn-3dobjectloader .preset-list .preset-selected .v-list__tile__title {
-    font-weight: 500;
+/* Normal (not dense) lists like the map.apps TOC. Doubled class: more specific than the
+   theme's list tile height, so the 48px thumbnails do not overlap the next row. */
+.vue-base .dn-3dobjectloader.dn-3dobjectloader .preset-list .v-list__tile,
+.vue-base .dn-3dobjectloader.dn-3dobjectloader .placed-list .v-list__tile {
+    height: 56px;
 }
 
 /* Step 1 read-only (edit mode): inactive presets are visibly disabled. */
@@ -206,34 +214,28 @@
     cursor: default;
 }
 
+/* Thumbnails are transparent 96px PNGs (2x), cropped to the model. */
 .vue-base .dn-3dobjectloader .thumb {
-    width: 36px;
-    height: 36px;
-    border-radius: 6px;
-    background-color: rgba(0, 0, 0, 0.04);
+    width: 48px;
+    height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgba(0, 0, 0, 0.08);
     overflow: hidden;
 }
 
 .vue-base .dn-3dobjectloader .thumb .thumb-img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     display: block;
-}
-
-.vue-base .dn-3dobjectloader .title-field {
-    font-size: 13px;
 }
 
 /* Step 1: custom upload */
 .vue-base .dn-3dobjectloader .drop-zone {
     position: relative;
-    border: 2px dashed rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
+    border: 1px dashed currentcolor;
+    border-radius: 4px;
     padding: 12px 18px;
     text-align: center;
     display: flex;
@@ -241,14 +243,9 @@
     align-items: center;
     gap: 4px;
     cursor: pointer;
-    transition: background-color 0.15s, border-color 0.15s;
 }
 
-.vue-base .dn-3dobjectloader .drop-zone.dragging {
-    background-color: rgba(0, 0, 0, 0.04);
-    border-color: rgba(0, 0, 0, 0.45);
-}
-
+.vue-base .dn-3dobjectloader .drop-zone.dragging,
 .vue-base .dn-3dobjectloader .drop-zone.has-file {
     border-style: solid;
 }
@@ -267,14 +264,11 @@
 }
 
 .vue-base .dn-3dobjectloader .drop-zone .drop-title {
-    font-weight: 600;
-    font-size: 14px;
-    color: rgba(0, 0, 0, 0.75);
+    font-weight: 700;
 }
 
 .vue-base .dn-3dobjectloader .drop-zone .drop-subtitle {
-    color: rgba(0, 0, 0, 0.5);
-    font-size: 12px;
+    font-size: 0.875em;
 }
 
 .vue-base .dn-3dobjectloader .drop-zone .badges {
@@ -292,9 +286,7 @@
     align-items: center;
     gap: 10px;
     margin: 6px 0 4px 0;
-    color: rgba(0, 0, 0, 0.55);
-    font-weight: 500;
-    font-size: 12px;
+    font-size: 0.875em;
     text-align: center;
 }
 
@@ -302,7 +294,8 @@
 .vue-base .dn-3dobjectloader .url-divider::after {
     content: "";
     flex: 1;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    border-bottom: 1px solid currentcolor;
+    opacity: 0.25;
 }
 
 /* Step 2 */
@@ -359,23 +352,29 @@
     margin: 0;
 }
 
-/* Step 3 */
-.vue-base .dn-3dobjectloader .step-3 .mask-actions {
-    display: flex;
-    justify-content: center;
-    margin: 8px 0;
-}
-
 /* Placing hint */
 .vue-base .dn-3dobjectloader .placing-hint {
     margin-bottom: 10px;
 }
 
+/* Align the icon with the first text line (the heading) instead of centering it. */
+.vue-base .dn-3dobjectloader .placing-alert {
+    align-items: flex-start;
+}
+
+/* Doubled classes: Vuetify and themes center the alert icon with a higher specificity. */
+.vue-base .dn-3dobjectloader .placing-alert.placing-alert > .v-icon.v-icon {
+    align-self: flex-start;
+    /* Centers the 24px icon on the 18px heading line. */
+    margin-top: -3px;
+}
+
 .vue-base .dn-3dobjectloader .placing-alert-body {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     gap: 4px;
-    font-weight: 500;
+    font-weight: 700;
 }
 
 /* Final screen */
@@ -401,7 +400,7 @@
 
 .vue-base .dn-3dobjectloader .final-banner-text {
     font-weight: 700;
-    font-size: 15px;
+    font-size: 1.1em;
 }
 
 .vue-base .dn-3dobjectloader .final-content {
@@ -415,8 +414,7 @@
 .vue-base .dn-3dobjectloader .final-question {
     text-align: center;
     margin-bottom: 14px;
-    color: rgba(0, 0, 0, 0.75);
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .vue-base .dn-3dobjectloader .final-primary {
@@ -424,14 +422,9 @@
     justify-content: center;
 }
 
+/* The final footer is a .button-bar (secondary buttons left, primary right) with more space above. */
 .vue-base .dn-3dobjectloader .final-footer {
-    display: flex;
-    justify-content: space-between;
-    gap: 4px;
     padding-top: 12px;
-    border-top: 1px solid rgba(0, 0, 0, 0.08);
-    flex-shrink: 0;
-    margin-top: auto;
 }
 
 /* List view */
@@ -440,27 +433,19 @@
     align-items: center;
     justify-content: space-between;
     padding: 4px 0 10px 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-    margin-bottom: 8px;
 }
 
 .vue-base .dn-3dobjectloader .list-title {
-    font-weight: 600;
-    font-size: 14px;
+    font-weight: 700;
 }
 
 .vue-base .dn-3dobjectloader .list-count {
-    color: rgba(0, 0, 0, 0.5);
     font-weight: 400;
 }
 
 .vue-base .dn-3dobjectloader .placed-list {
     flex: 1;
     overflow-y: auto;
-}
-
-.vue-base .dn-3dobjectloader .placed-list .placed-list-item.selected {
-    background-color: rgba(0, 0, 0, 0.06);
 }
 
 .vue-base .dn-3dobjectloader .placed-list .empty-hint {
@@ -472,7 +457,6 @@
 
 [class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader {
     padding: 8px 10px;
-    font-size: 12px;
 }
 
 [class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader .stepper .step .label {
@@ -496,15 +480,30 @@
     padding: 14px 10px;
 }
 
-[class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader .button-bar,
-[class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader .final-footer {
+[class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader .button-bar {
     flex-wrap: wrap;
     row-gap: 6px;
 }
 
-/* Mobile: the whole bundle scrolls, so undo the flex stretch of the preset
-   list; otherwise it would never get its own height and would compete with the
-   bundle scroll. */
+/* Mobile: the three final screen buttons do not fit in one row, so they stack at
+   full width with the primary button (close) at the bottom. */
+[class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader .final-footer .v-btn {
+    flex: 1 1 100%;
+    margin: 0;
+}
+
+[class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader .final-footer .spacer {
+    display: none;
+}
+
+/* Mobile: the whole widget scrolls instead of the preset list alone, so the step
+   header and the button bar do not permanently occupy the short viewport. The step
+   column and the preset list lose their flex stretch and their own scrolling.
+   Keep in sync with the `@media (max-height: 500px)` block below. */
+[class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader.dn-3dobjectloader {
+    overflow: hidden auto;
+}
+
 [class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader .preset-tab {
     flex: 0 1 auto;
     display: block;
@@ -515,42 +514,33 @@
     overflow: visible;
 }
 
-/* Mobile: the whole bundle scrolls, so the step header and the action bar do
-   not permanently occupy the short viewport. */
-[class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader.dn-3dobjectloader {
-    overflow: hidden auto;
-    -webkit-overflow-scrolling: touch;
-}
-
 [class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader .step-content,
 [class*="ctLayout_mobile_"] .vue-base .dn-3dobjectloader .step-body {
     min-height: auto;
     overflow: visible;
 }
 
-/* The window (`.dn-3dobjectloader-sheet`) is outside `.vue-base`, so no prefix.
-   `!important` is needed below: the window manager sets the window position and
-   size as inline styles. */
-.dn-3dobjectloader-sheet {
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15);
-    overflow: hidden;
-}
+/* Short screens (e.g. a phone in landscape, which map.apps treats as a tablet layout):
+   the same scroll rules as on mobile. CSS cannot combine the media query with the
+   ctLayout_mobile_ class in one selector, so keep both blocks in sync. */
+@media (max-height: 500px) {
+    .vue-base .dn-3dobjectloader.dn-3dobjectloader {
+        overflow: hidden auto;
+    }
 
-.ctLayout_mobile_portrait .dn-3dobjectloader-sheet {
-    height: 50vh !important;
-    top: auto !important;
-    bottom: 0 !important;
-}
+    .vue-base .dn-3dobjectloader.dn-3dobjectloader .step-content,
+    .vue-base .dn-3dobjectloader.dn-3dobjectloader .step-body {
+        min-height: auto;
+        overflow: visible;
+    }
 
-/* Landscape: left side panel at full height, 50vw wide, sticky at l: 0.
-   Overrides the shared sheet rule (top border radius / top shadow) with square
-   corners and a shadow to the right. */
-.ctLayout_mobile_landscape .dn-3dobjectloader-sheet {
-    width: 50vw !important;
-    height: auto !important;
-    inset: 0 auto 0 0 !important;
-    border-radius: 0 !important;
-    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.15);
+    .vue-base .dn-3dobjectloader.dn-3dobjectloader .preset-tab {
+        flex: 0 1 auto;
+        display: block;
+    }
+
+    .vue-base .dn-3dobjectloader.dn-3dobjectloader .preset-list {
+        flex: 0 1 auto;
+        overflow: visible;
+    }
 }

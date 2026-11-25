@@ -36,19 +36,29 @@
             </v-btn>
         </div>
         <v-list
-            dense
             class="placed-list"
         >
             <v-list-tile
                 v-for="it in items"
                 :key="it.id"
-                class="placed-list-item"
-                :class="{ selected: selectedId === it.id }"
+                :value="selectedId === it.id"
                 @click="$emit('select', it.id)"
             >
-                <v-list-tile-avatar>
+                <v-list-tile-avatar
+                    size="48"
+                    tile
+                >
                     <div class="thumb">
-                        <v-icon color="grey darken-1">
+                        <img
+                            v-if="thumbnailOf(it)"
+                            :src="thumbnailOf(it)"
+                            alt=""
+                            class="thumb-img"
+                        >
+                        <v-icon
+                            v-else
+                            color="grey darken-1"
+                        >
                             material-icon-3d_rotation
                         </v-icon>
                     </div>
@@ -99,7 +109,7 @@
         <div class="button-bar">
             <v-spacer />
             <v-btn
-                text
+                color="primary"
                 @click="$emit('close')"
             >
                 <v-icon
@@ -121,9 +131,21 @@
         props: {
             i18n: { type: Object, required: true },
             items: { type: Array as () => any[], default: () => [] },
+            presets: { type: Array as () => any[], default: () => [] },
             selectedId: { type: String, default: undefined }
         },
+        computed: {
+            /** Preset thumbnails by preset id, so a row needs no search through the presets. */
+            thumbnailsById(): Record<string, string | undefined> {
+                const byId: Record<string, string | undefined> = {};
+                this.presets.forEach((p: any) => { byId[p.id] = p.thumbnail; });
+                return byId;
+            }
+        },
         methods: {
+            thumbnailOf(it: any): string | undefined {
+                return it.source === "preset" ? this.thumbnailsById[it.presetId] : undefined;
+            },
             effW(it: any): number { return it.width * (it.scalePercent / 100); },
             effD(it: any): number { return it.depth * (it.scalePercent / 100); },
             effH(it: any): number { return it.height * (it.scalePercent / 100); },

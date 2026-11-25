@@ -38,19 +38,19 @@
                 class="preset-tab"
             >
                 <v-list
-                    dense
                     class="preset-list"
                 >
                     <v-list-tile
                         v-for="p in presets"
                         :key="p.id"
-                        :class="{
-                            'preset-selected': activePresetId === p.id,
-                            'preset-readonly': editMode && activePresetId !== p.id
-                        }"
+                        :value="activePresetId === p.id"
+                        :class="{ 'preset-readonly': editMode && activePresetId !== p.id }"
                         @click="onSelectPreset(p)"
                     >
-                        <v-list-tile-avatar>
+                        <v-list-tile-avatar
+                            size="48"
+                            tile
+                        >
                             <div class="thumb">
                                 <img
                                     v-if="p.thumbnail"
@@ -87,18 +87,13 @@
             >
                 <v-alert
                     type="info"
+                    color="primary"
                     outline
                     dense
                     class="unit-info"
                     :value="true"
                 >
-                    <v-icon
-                        slot="prepend"
-                        color="info"
-                    >
-                        material-icon-info_outline
-                    </v-icon>
-                    <span class="text--text">{{ i18n.step1.glbUnitInfo }}</span>
+                    <span>{{ i18n.step1.glbUnitInfo }}</span>
                 </v-alert>
                 <div
                     role="button"
@@ -139,7 +134,7 @@
                             >
                                 <v-icon
                                     left
-                                    x-small
+                                    small
                                 >
                                     material-icon-3d_rotation
                                 </v-icon>
@@ -152,7 +147,7 @@
                             >
                                 <v-icon
                                     left
-                                    x-small
+                                    small
                                 >
                                     material-icon-data_usage
                                 </v-icon>
@@ -172,7 +167,7 @@
                         </div>
                         <v-btn
                             v-if="!editMode"
-                            x-small
+                            small
                             outline
                             color="error"
                             class="mt-2"
@@ -180,7 +175,7 @@
                         >
                             <v-icon
                                 left
-                                x-small
+                                small
                             >
                                 material-icon-close
                             </v-icon>
@@ -208,7 +203,6 @@
                     :disabled="editMode"
                     hide-details
                     dense
-                    outline
                     prepend-inner-icon="material-icon-link"
                     class="mb-3"
                     @input="$emit('update:draftUrl', $event)"
@@ -220,9 +214,8 @@
                 :label="i18n.step1.titleLabel"
                 hide-details
                 dense
-                outline
                 prepend-inner-icon="material-icon-title"
-                class="title-field mt-3"
+                class="mt-3"
                 @input="$emit('update:draftTitle', $event)"
             />
         </div>
