@@ -24,29 +24,20 @@
             >
                 <v-alert
                     type="info"
+                    color="primary"
                     outline
                     class="placing-alert"
                     :value="true"
                 >
-                    <v-icon
-                        slot="prepend"
-                        color="info"
-                        size="24"
-                    >
-                        material-icon-my_location
-                    </v-icon>
-                    <div class="placing-alert-body text--text">
+                    <div class="placing-alert-body">
                         <strong>{{ i18n.ui.clickMapInstruction }}</strong>
                         <v-btn
-                            x-small
-                            text
-                            class="mt-1"
+                            outline
+                            color="primary"
+                            class="mt-2 ml-0"
                             @click="$emit('prev-step')"
                         >
-                            <v-icon
-                                left
-                                x-small
-                            >
+                            <v-icon left>
                                 material-icon-close
                             </v-icon>
                             {{ i18n.ui.cancelPlacement }}
@@ -76,7 +67,6 @@
                             :label="geographicCoordinates ? i18n.step2.longitude : i18n.step2.easting"
                             hide-details
                             dense
-                            outline
                             @input="onPosition('x', editX)"
                         />
                         <v-text-field
@@ -86,7 +76,6 @@
                             :label="geographicCoordinates ? i18n.step2.latitude : i18n.step2.northing"
                             hide-details
                             dense
-                            outline
                             @input="onPosition('y', editY)"
                         />
                         <v-text-field
@@ -96,7 +85,6 @@
                             :label="i18n.step2.elevation"
                             hide-details
                             dense
-                            outline
                             @input="onPosition('z', editZ)"
                         />
                         <v-text-field
@@ -106,7 +94,6 @@
                             :label="i18n.step2.heading"
                             hide-details
                             dense
-                            outline
                             suffix="°"
                             @input="emitHeading"
                         />
@@ -153,7 +140,6 @@
                             :disabled="proportional"
                             hide-details
                             dense
-                            outline
                             suffix="m"
                             @input="onDim('height', editHeight)"
                         />
@@ -172,7 +158,6 @@
                             :disabled="proportional"
                             hide-details
                             dense
-                            outline
                             suffix="m"
                             @input="onDim('width', editWidth)"
                         />
@@ -191,7 +176,6 @@
                             :disabled="proportional"
                             hide-details
                             dense
-                            outline
                             suffix="m"
                             @input="onDim('depth', editDepth)"
                         />
@@ -204,12 +188,6 @@
                         class="distortion-warning"
                         :value="true"
                     >
-                        <v-icon
-                            slot="prepend"
-                            color="warning"
-                        >
-                            material-icon-warning
-                        </v-icon>
                         <span class="text--text">{{ i18n.step2.distortionWarning }}</span>
                     </v-alert>
                 </section>
@@ -233,7 +211,6 @@
                             :disabled="!proportional"
                             hide-details
                             dense
-                            outline
                             suffix="%"
                             class="scale-field"
                             @input="emitScale"
@@ -246,7 +223,7 @@
         <div class="button-bar">
             <v-btn
                 v-if="canGoBack"
-                text
+                color="secondary"
                 @click="$emit('prev-step')"
             >
                 <v-icon left>
@@ -255,7 +232,7 @@
                 {{ i18n.buttons.back }}
             </v-btn>
             <v-btn
-                text
+                color="secondary"
                 @click="$emit('reset-step')"
             >
                 <v-icon left>

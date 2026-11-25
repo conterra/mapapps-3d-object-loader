@@ -20,18 +20,13 @@
         <div class="step-body">
             <v-alert
                 type="info"
+                color="primary"
                 outline
                 dense
                 class="step-info"
                 :value="true"
             >
-                <v-icon
-                    slot="prepend"
-                    color="info"
-                >
-                    material-icon-info_outline
-                </v-icon>
-                <span class="text--text">{{ i18n.step3.instruction }}</span>
+                <span>{{ i18n.step3.instruction }}</span>
             </v-alert>
             <section
                 v-if="hasMask"
@@ -53,7 +48,6 @@
                     min="1"
                     hide-details
                     dense
-                    outline
                     suffix="m"
                     class="mask-height-field"
                     @input="emitMaskHeight"
@@ -63,7 +57,7 @@
 
         <div class="button-bar">
             <v-btn
-                text
+                color="secondary"
                 @click="$emit('prev-step')"
             >
                 <v-icon left>
@@ -72,7 +66,7 @@
                 {{ i18n.buttons.back }}
             </v-btn>
             <v-btn
-                text
+                color="secondary"
                 @click="$emit('reset-mask')"
             >
                 <v-icon left>

@@ -44,43 +44,35 @@
                 </v-btn>
             </div>
         </div>
-        <div class="final-footer">
+        <div class="button-bar final-footer">
             <v-btn
-                text
-                small
-                @click="$emit('close')"
-            >
-                <v-icon
-                    left
-                    small
-                >
-                    material-icon-close
-                </v-icon>{{ i18n.final.close }}
-            </v-btn>
-            <v-btn
-                text
-                small
+                color="secondary"
                 :disabled="!lastSavedId"
                 @click="$emit('edit-last')"
             >
-                <v-icon
-                    left
-                    small
-                >
+                <v-icon left>
                     material-icon-edit
-                </v-icon>{{ i18n.final.editLast }}
+                </v-icon>
+                {{ i18n.final.editLast }}
             </v-btn>
             <v-btn
-                text
-                small
+                color="secondary"
                 @click="$emit('show-list')"
             >
-                <v-icon
-                    left
-                    small
-                >
+                <v-icon left>
                     material-icon-menu
-                </v-icon>{{ i18n.final.showList }}
+                </v-icon>
+                {{ i18n.final.showList }}
+            </v-btn>
+            <v-spacer />
+            <v-btn
+                color="primary"
+                @click="$emit('close')"
+            >
+                <v-icon left>
+                    material-icon-close
+                </v-icon>
+                {{ i18n.final.close }}
             </v-btn>
         </div>
     </div>
